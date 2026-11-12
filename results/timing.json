@@ -1,0 +1,20 @@
+{
+  "near_feasible": {
+    "seconds": 109.4,
+    "feasibility (max normalized violation)": 0.2031328317900165,
+    "objectives [(L_gradB, minimize?), (aspect_ratio, minimize?)]": [
+      [
+        5.667772918967057,
+        false
+      ],
+      [
+        9.723456885198692,
+        true
+      ]
+    ],
+    "hypervolume_score": 0.0,
+    "dataset_worst_violation": 0.2031328197555023,
+    "dataset_L_gradB": 5.667770794984658,
+    "dataset_aspect_ratio": 9.723456885198697
+  }
+}

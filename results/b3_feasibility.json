@@ -1,0 +1,24 @@
+{
+  "rows_total": 182222,
+  "rows_with_metrics": 158685,
+  "feasible": 0,
+  "feasible_pct": 0.0,
+  "near_feasible_worst_violation_le_0.05": 0,
+  "near_feasible_worst_violation_le_0.10": 0,
+  "near_feasible_worst_violation_le_0.25": 10,
+  "pass_rate_per_constraint_pct": {
+    "edge_iota >= 0.25": 36.44,
+    "log10(qi) <= -3.5": 0.11,
+    "edge_mirror <= 0.25": 14.19,
+    "flux_compression <= 0.9": 24.79,
+    "vacuum_well >= 0": 4.8
+  },
+  "fails_only_this_constraint": {
+    "edge_iota >= 0.25": 0,
+    "log10(qi) <= -3.5": 166,
+    "edge_mirror <= 0.25": 0,
+    "flux_compression <= 0.9": 0,
+    "vacuum_well >= 0": 0
+  },
+  "feasible_by_n_field_periods": {}
+}

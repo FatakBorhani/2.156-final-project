@@ -1,0 +1,32 @@
+# Conda part of the project environment. Don't create it from this file alone: run
+#   ./setup_env.sh
+# which creates the env from this file, then pip-installs booz-xform and the benchmark
+# package (see the script for why that step can't live here).
+name: stellarator
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10          # the benchmark package is only tested on 3.10
+
+  # --- System libraries VMEC++ needs (libnetcdf-dev on Ubuntu) ---
+  - libnetcdf
+  - netcdf-fortran
+  - netcdf4
+
+  # --- Build tools for booz-xform 0.0.9 on macOS ---
+  - compilers
+  - cmake<4              # booz-xform 0.0.9's CMakeLists predates CMake 4
+  - ninja
+  - pybind11<3           # pybind11 3 breaks booz-xform on Mac (constellaration pins <3 too)
+  - scikit-build-core
+  - setuptools
+  - wheel
+
+  # --- Data loading ---
+  - huggingface_hub
+  - pyarrow
+
+  # --- Notebook tooling ---
+  - ipykernel
+  - jupyterlab
+  - pip

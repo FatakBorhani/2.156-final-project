@@ -1,0 +1,35 @@
+{
+  "b1_geometrical": {
+    "evaluated": 158685,
+    "feasible (max violation <= 0.01)": 0,
+    "max violation <= 0.1": 0,
+    "max violation <= 0.25": 3,
+    "max violation <= 0.5": 210,
+    "smallest max violation": 0.22376497656865757
+  },
+  "b2_simple_to_build_qi": {
+    "evaluated": 158685,
+    "feasible (max violation <= 0.01)": 0,
+    "max violation <= 0.1": 0,
+    "max violation <= 0.25": 0,
+    "max violation <= 0.5": 11665,
+    "smallest max violation": 0.2665919893429255
+  },
+  "b3_mhd_stable_qi": {
+    "evaluated": 158685,
+    "feasible (max violation <= 0.01)": 0,
+    "max violation <= 0.1": 0,
+    "max violation <= 0.25": 10,
+    "max violation <= 0.5": 4490,
+    "smallest max violation": 0.2031328197555023
+  },
+  "log10_qi_quantiles": {
+    "0.001": -3.47,
+    "0.01": -3.07,
+    "0.05": -2.75,
+    "0.25": -2.2,
+    "0.5": -1.78
+  },
+  "n_with_log10_qi_le_-3.5 (b3 bound)": 126,
+  "n_with_log10_qi_le_-4 (b2 bound)": 9
+}

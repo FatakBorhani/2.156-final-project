@@ -1,0 +1,27 @@
+{
+  "valid_designs": 158685,
+  "feasible (pass all 5)": 0,
+  "number_of_constraints_failed": {
+    "1": 166,
+    "2": 1332,
+    "3": 17509,
+    "4": 87790,
+    "5": 51888
+  },
+  "pass_QI": 169,
+  "pass_QI__pct_failing_each_other_constraint": {
+    "twist: |edge iota| >= 0.25": 99.4,
+    "mirror ratio <= 0.25": 100.0,
+    "flux compression <= 0.9": 97.0,
+    "vacuum well >= 0": 94.7
+  },
+  "pass_QI__median_violation_of_failed_other_constraints": {
+    "twist: |edge iota| >= 0.25": 0.58,
+    "mirror ratio <= 0.25": 0.59,
+    "flux compression <= 0.9": 0.65,
+    "vacuum well >= 0": 0.39
+  },
+  "pass_other_four": 166,
+  "pass_other_four__median_log10_qi": -1.64,
+  "pass_other_four__median_QI_violation": 0.53
+}

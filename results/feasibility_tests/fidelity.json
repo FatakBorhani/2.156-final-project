@@ -1,0 +1,134 @@
+{
+  "designs": {
+    "closest_to_feasible": 25,
+    "random": 25
+  },
+  "very_low_fidelity": {
+    "evaluated": 50,
+    "failed": 1,
+    "mean_seconds": 3.22,
+    "median_seconds": 3.5,
+    "speedup_vs_high_fidelity_~130s": 40.4,
+    "per_metric": {
+      "log10_qi": {
+        "spearman_vs_high": 0.982,
+        "mean_abs_error": 0.0471,
+        "max_abs_error": 0.1886,
+        "high_fidelity_std_in_sample": 0.5481
+      },
+      "abs_iota": {
+        "spearman_vs_high": 0.998,
+        "mean_abs_error": 0.0065,
+        "max_abs_error": 0.0437,
+        "high_fidelity_std_in_sample": 0.1239
+      },
+      "mirror": {
+        "spearman_vs_high": 0.99,
+        "mean_abs_error": 0.0067,
+        "max_abs_error": 0.0318,
+        "high_fidelity_std_in_sample": 0.1337
+      },
+      "flux_compression": {
+        "spearman_vs_high": 0.966,
+        "mean_abs_error": 0.0258,
+        "max_abs_error": 0.0952,
+        "high_fidelity_std_in_sample": 0.2364
+      },
+      "vacuum_well": {
+        "spearman_vs_high": 0.995,
+        "mean_abs_error": 0.0062,
+        "max_abs_error": 0.0646,
+        "high_fidelity_std_in_sample": 0.14
+      },
+      "L_gradB": {
+        "spearman_vs_high": 0.876,
+        "mean_abs_error": 0.7255,
+        "max_abs_error": 5.434,
+        "high_fidelity_std_in_sample": 2.2638
+      },
+      "aspect_ratio": {
+        "spearman_vs_high": 1.0,
+        "mean_abs_error": 0.0,
+        "max_abs_error": 0.0,
+        "high_fidelity_std_in_sample": 1.8235
+      }
+    },
+    "pass_fail_agreement_per_constraint": {
+      "log10_qi": 1.0,
+      "abs_iota": 0.959,
+      "mirror": 1.0,
+      "flux_compression": 0.918,
+      "vacuum_well": 0.98
+    },
+    "worst_violation": {
+      "spearman_all": 0.971,
+      "spearman_25_closest": 0.796,
+      "mean_abs_error_25_closest": 0.0196,
+      "max_abs_error_25_closest": 0.0574
+    }
+  },
+  "low_fidelity": {
+    "evaluated": 50,
+    "failed": 1,
+    "mean_seconds": 8.13,
+    "median_seconds": 8.61,
+    "speedup_vs_high_fidelity_~130s": 16.0,
+    "per_metric": {
+      "log10_qi": {
+        "spearman_vs_high": 0.981,
+        "mean_abs_error": 0.0468,
+        "max_abs_error": 0.1877,
+        "high_fidelity_std_in_sample": 0.5481
+      },
+      "abs_iota": {
+        "spearman_vs_high": 0.998,
+        "mean_abs_error": 0.006,
+        "max_abs_error": 0.0438,
+        "high_fidelity_std_in_sample": 0.1239
+      },
+      "mirror": {
+        "spearman_vs_high": 0.991,
+        "mean_abs_error": 0.0067,
+        "max_abs_error": 0.0318,
+        "high_fidelity_std_in_sample": 0.1337
+      },
+      "flux_compression": {
+        "spearman_vs_high": 0.972,
+        "mean_abs_error": 0.0235,
+        "max_abs_error": 0.0994,
+        "high_fidelity_std_in_sample": 0.2364
+      },
+      "vacuum_well": {
+        "spearman_vs_high": 0.994,
+        "mean_abs_error": 0.0058,
+        "max_abs_error": 0.0645,
+        "high_fidelity_std_in_sample": 0.14
+      },
+      "L_gradB": {
+        "spearman_vs_high": 0.867,
+        "mean_abs_error": 0.7478,
+        "max_abs_error": 5.4301,
+        "high_fidelity_std_in_sample": 2.2638
+      },
+      "aspect_ratio": {
+        "spearman_vs_high": 1.0,
+        "mean_abs_error": 0.0,
+        "max_abs_error": 0.0,
+        "high_fidelity_std_in_sample": 1.8235
+      }
+    },
+    "pass_fail_agreement_per_constraint": {
+      "log10_qi": 1.0,
+      "abs_iota": 0.959,
+      "mirror": 1.0,
+      "flux_compression": 0.918,
+      "vacuum_well": 0.98
+    },
+    "worst_violation": {
+      "spearman_all": 0.977,
+      "spearman_25_closest": 0.838,
+      "mean_abs_error_25_closest": 0.0177,
+      "max_abs_error_25_closest": 0.0536
+    }
+  }
+}

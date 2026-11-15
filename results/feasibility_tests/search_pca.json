@@ -1,0 +1,54 @@
+{
+  "n_candidates": 40,
+  "margin": 0.05,
+  "radii_std_units": {
+    "small": 0.5,
+    "large": 1.5
+  },
+  "small": {
+    "vmec_failed": 20,
+    "vmec_failed_very_low": 16,
+    "feasible_high_fidelity": 0,
+    "improved_vs_seed": "0/0",
+    "median_seed_worst": NaN,
+    "median_candidate_worst": NaN,
+    "best_candidate_worst": NaN,
+    "median_predicted_worst": NaN,
+    "surrogate_error_worst (actual - predicted): median": NaN,
+    "surrogate_error_worst: mean abs": NaN,
+    "per_constraint_mean_abs_error": {
+      "log10_qi": NaN,
+      "abs_iota": NaN,
+      "mirror": NaN,
+      "flux_compression": NaN,
+      "vacuum_well": NaN
+    },
+    "ensemble_spread_vs_abs_error_spearman": null,
+    "very_low_vs_high_worst_spearman": null,
+    "median_step_size_std_units": 2.51,
+    "by_seed_group": {}
+  },
+  "large": {
+    "vmec_failed": 20,
+    "vmec_failed_very_low": 20,
+    "feasible_high_fidelity": 0,
+    "improved_vs_seed": "0/0",
+    "median_seed_worst": NaN,
+    "median_candidate_worst": NaN,
+    "best_candidate_worst": NaN,
+    "median_predicted_worst": NaN,
+    "surrogate_error_worst (actual - predicted): median": NaN,
+    "surrogate_error_worst: mean abs": NaN,
+    "per_constraint_mean_abs_error": {
+      "log10_qi": NaN,
+      "abs_iota": NaN,
+      "mirror": NaN,
+      "flux_compression": NaN,
+      "vacuum_well": NaN
+    },
+    "ensemble_spread_vs_abs_error_spearman": null,
+    "very_low_vs_high_worst_spearman": null,
+    "median_step_size_std_units": 6.15,
+    "by_seed_group": {}
+  }
+}

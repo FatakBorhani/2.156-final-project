@@ -1,0 +1,61 @@
+{
+  "n_candidates": 40,
+  "margin": 0.05,
+  "radii_std_units": {
+    "small": 0.25,
+    "large": 1.0
+  },
+  "small": {
+    "vmec_failed": 14,
+    "feasible_high_fidelity": 0,
+    "improved_vs_seed": "3/6",
+    "median_seed_worst": 0.77,
+    "median_candidate_worst": 0.77,
+    "best_candidate_worst": 0.429,
+    "median_predicted_worst": 0.25,
+    "surrogate_error_worst (actual - predicted): median": 0.365,
+    "surrogate_error_worst: mean abs": 0.578,
+    "per_constraint_mean_abs_error": {
+      "log10_qi": 0.305,
+      "abs_iota": 0.098,
+      "mirror": 0.787,
+      "flux_compression": 0.117,
+      "vacuum_well": 0.322
+    },
+    "ensemble_spread_vs_abs_error_spearman": -0.43,
+    "very_low_vs_high_worst_spearman": 1.0,
+    "median_step_size_std_units": 1.9,
+    "by_seed_group": {
+      "closest": {
+        "improved": "0/2",
+        "median_change_in_worst": 0.716
+      },
+      "passes_QI": {
+        "improved": "3/4",
+        "median_change_in_worst": -0.287
+      }
+    }
+  },
+  "large": {
+    "vmec_failed": 20,
+    "feasible_high_fidelity": 0,
+    "improved_vs_seed": "0/0",
+    "median_seed_worst": NaN,
+    "median_candidate_worst": NaN,
+    "best_candidate_worst": NaN,
+    "median_predicted_worst": NaN,
+    "surrogate_error_worst (actual - predicted): median": NaN,
+    "surrogate_error_worst: mean abs": NaN,
+    "per_constraint_mean_abs_error": {
+      "log10_qi": NaN,
+      "abs_iota": NaN,
+      "mirror": NaN,
+      "flux_compression": NaN,
+      "vacuum_well": NaN
+    },
+    "ensemble_spread_vs_abs_error_spearman": null,
+    "very_low_vs_high_worst_spearman": NaN,
+    "median_step_size_std_units": 6.37,
+    "by_seed_group": {}
+  }
+}

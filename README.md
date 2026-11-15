@@ -152,7 +152,7 @@ meaningful claim. It also means we can't rerun the full baseline on a laptop.
 
 ---
 
-## What the feasibility tests showed (Nov 14–15)
+## What the feasibility tests showed (Nov 14–16)
 
 Quick, throwaway checks of the plan's riskiest assumptions, on the 68k designs with 3
 field periods. Full write-up, numbers and figures:
@@ -164,20 +164,26 @@ field periods. Full write-up, numbers and figures:
 | 4 | Can cheap VMEC++ stand in for the expensive version? | **As a filter, yes.** Very low fidelity is 40× faster (3 s) and ranks designs the same, but its errors (~0.06) are too big for the final verdict |
 | 3 | Can shapes be compressed without changing the physics? | **With a VAE, yes.** At 16 numbers it rebuilds designs that all still solve and generates valid shapes ~80% of the time (PCA: 26–52%). But it blurs QI by ~0.2–0.35 in log10 |
 | 2, 2b | Does searching on the surrogate, then checking once, find better real designs? | **No.** Most searched shapes break in VMEC++ and none were feasible. The search lands on unfamiliar shapes where the surrogate is confidently wrong (mirror ratio predicted ~0.05, actually 1.4–2.4) |
+| 5 | Does a small physics-in-the-loop search work? | **Yes.** In 1,600 cheap VMEC++ runs per method, it found designs about **twice as close to feasible** as anything in the dataset (worst violation 0.203 → **0.096**). VAE steps did best; surrogate + PCA steps were no better than random steps. Nothing feasible yet |
 
-**The encouraging sign:** in a follow-up check, the first 10–25% of a search step made
-the real design better about half the time.
+**Test 5 in one picture:** median distance to feasible over 20 seed designs, for three
+search methods with the same VMEC++ budget. Lower is better.
+
+![Test 5](results/feasibility_tests/loop.png)
 
 **What changes in the plan:**
 
 - **Physics in the loop is the core of the method, not an add-on.** Take small steps with
   the surrogate, check them with very low fidelity VMEC++, add the results to the training
-  data, retrain, and repeat. Confirm the best at high fidelity.
+  data, retrain, and repeat. Confirm the best at high fidelity. Test 5 shows this works.
 - **Search in a VAE latent space** to stay on shapes VMEC++ can solve, then refine
   finalists in the full coefficients (the VAE blurs QI too much for the last step).
 - **Mirror ratio is the surrogate's worst blind spot** on new shapes, then QI and vacuum
   well. Disagreement between ensemble models didn't flag the errors, so we need a better
   safety check (e.g. a trust region around evaluated designs).
+- **Always compare against random steps.** In Test 5 the surrogate with PCA steps didn't
+  beat plain trial and error. The VAE did, though partly because its steps were bigger.
+  That comparison is our honest "does ML help" test.
 
 ---
 
@@ -276,7 +282,7 @@ Run from the repo root with the `stellarator` env active. Each script's docstrin
 | `scripts/count_feasible.py` | Pass rate of each requirement across the dataset | ~1 min |
 | `scripts/check_feasibility.py` | Feasibility counts with the benchmark's own function, all 3 benchmarks | ~2 min |
 | `scripts/time_eval.py` | Times one official evaluation | ~2 min |
-| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE) | 5–60 min each |
+| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop) | 5–60 min each |
 
 The first data script downloads the dataset (~600 MB) into the Hugging Face cache.
 

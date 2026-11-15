@@ -11,11 +11,14 @@ valid designs with 3 field periods.*
 | 2b | Same, but searching only along PCA directions | ✅ done | **No.** Worse: 0/40 solved at high fidelity |
 | 3 | Can shapes be compressed (PCA vs. VAE) without changing the physics? | ✅ done | **VAE yes**, PCA only at 32 dims. Both blur fine QI detail |
 | 4 | Can low-fidelity VMEC++ stand in for high fidelity? | ✅ done | **Yes, as a filter.** Not for the final score |
+| 5 | Does a small physics-in-the-loop search work, and does the surrogate help? | ✅ done | **The loop works:** closest design 0.203 → **0.096**. VAE steps best; surrogate + PCA steps no better than random |
 
 **Bottom line:** the pieces work (surrogate on known shapes, VAE latent space, cheap
 VMEC++ filter), but "optimize the surrogate, then check once" does not. The search walks
 off the data, where the surrogate is confidently wrong. **Physics-in-the-loop with small
-steps and retraining is required, not optional.** Details below.
+steps and retraining is required, not optional.** Test 5 confirms it: a small loop
+roughly halved the closest design's gap to feasible on a laptop in under an hour. No
+design is feasible yet. Details below.
 
 ## Test 1: surrogate accuracy
 
@@ -182,6 +185,58 @@ paths. Simple blending doesn't cross the gap.
   design needs to close. Final designs must be refined in the full 81 coefficients.
 - This VAE is untuned (β = 0.05, 80 epochs). Lower β or property heads should help.
 
+## Test 5: a small physics-in-the-loop search
+
+`scripts/feasibility_tests/loop_test.py` → `loop.json`, `loop.png`, `loop_history.csv`, `loop_final_*.csv`
+
+Same 20 seeds. Three arms with the **same VMEC++ budget**: 10 rounds × 8 designs per seed
+at very low fidelity = 1,600 runs per arm. Each arm keeps a design only if VMEC++ says
+it's better, with a step size that grows after progress and halves otherwise.
+
+- **No surrogate (control):** 8 random small steps along the top 16 PCA directions.
+- **Surrogate, PCA steps:** score 4,000 random small PCA steps with the surrogate, send
+  the best 8 (spread out) to VMEC++, fine-tune the surrogate on the results each round.
+- **Surrogate, VAE steps:** same, but steps are taken in a 16-dim VAE latent space and only
+  the *change* is applied to the design (x + dec(z + dz) − dec(z)), so the VAE's QI blur
+  doesn't touch the design.
+
+Surrogate predictions are anchored to what VMEC++ measured at the current design, which
+removes the offset that broke Tests 2/2b. 55 min on the laptop. Final designs re-checked
+at high fidelity.
+
+| After 1,600 runs per arm | No surrogate | Surrogate, PCA | Surrogate, VAE |
+|---|---|---|---|
+| Median best worst violation, very low fidelity (start 0.36) | 0.233 | 0.242 | **0.174** |
+| Seeds improved, high fidelity | 17 / 17 solved | 16 / 16 solved | 17 / 17 solved |
+| Best design, high fidelity (dataset best: 0.203) | 0.132 | 0.141 | **0.096** |
+| Seed where this arm did best | 4 | 7 | **9** |
+| 10 closest seeds: mean worst, high fidelity (start 0.230) | 0.181 | 0.187 | **0.156** |
+| "Passes QI" seeds: median change, high fidelity | −0.52 | −0.69 | −0.69 |
+| Shapes VMEC++ couldn't solve | 13% | 13% | 21% |
+| Final designs that failed at high fidelity | 3 | 4 | 3 |
+| Feasible | 0 | 0 | 0 |
+
+![Test 5](loop.png)
+
+- **The loop works.** Every arm improved every seed at very low fidelity, and every final
+  design that solved at high fidelity beat its seed there too. **All three found designs closer to feasible than anything in the
+  182k-design dataset.** The best (VAE arm) has worst violation 0.096, with the remaining
+  gap spread evenly: mirror 0.096, vacuum well 0.094, QI 0.041 (log10 qi = −3.36 vs. the
+  −3.5 limit). Its L∇B is 3.9 and aspect ratio 10.3.
+- **VAE steps did best** and were still improving at round 10. **Caveat:** for the same
+  step setting, VAE steps were ~4× larger in coefficient terms (median 0.69 vs. 0.18
+  per-coefficient std units), which also explains its higher failure rate. Some of its
+  edge may come from taking bigger steps, not from the VAE itself. A matched-step rerun
+  would separate the two.
+- **Surrogate + PCA steps were no better than random steps,** even though fine-tuning
+  worked: its prediction error fell from 0.06–0.09 to ~0.015 by round 5. With small
+  steps, random trial and error is already efficient, so the surrogate's value has to
+  come from taking bigger, smarter steps.
+- **Mirror ratio still bit first.** Before fine-tuning, the surrogate favored steps that
+  helped QI but broke mirror ratio. Fine-tuning fixed that within a few rounds.
+- **Very low fidelity isn't enough to finish.** 10 of 60 final designs that solved at very
+  low fidelity failed at high fidelity. Check several candidates per seed at high fidelity.
+
 ## What this means for the plan
 
 1. **Surrogate:** a neural net is viable for QI *on known shapes*. Boosted trees are a
@@ -198,4 +253,10 @@ paths. Simple blending doesn't cross the gap.
    well. Ensemble spread didn't catch the errors, so the uncertainty estimate needs work
    (e.g. a trust region around evaluated designs rather than trusting spread).
 5. **Refine finalists in full coefficients.** The VAE blurs QI too much for the last step.
-6. **Seed choice matters:** "passes QI" seeds improved most in Test 2.
+6. **Seed choice matters:** "passes QI" seeds improved most in Tests 2 and 5.
+7. **The loop is the method, and the VAE is the search space (Test 5).** It roughly
+   halved the closest design's gap in 1,600 cheap runs per arm. Next: separate the VAE
+   effect from step size, run longer (the VAE arm hadn't stopped improving), and check
+   more finalists at high fidelity.
+8. **The surrogate must earn its place.** Against the random-step control, it hasn't yet.
+   Keep the control in every experiment: it's our honest "does ML help" comparison.

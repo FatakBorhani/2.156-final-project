@@ -152,6 +152,35 @@ meaningful claim. It also means we can't rerun the full baseline on a laptop.
 
 ---
 
+## What the feasibility tests showed (Nov 14–15)
+
+Quick, throwaway checks of the plan's riskiest assumptions, on the 68k designs with 3
+field periods. Full write-up, numbers and figures:
+**[results/feasibility_tests/SUMMARY.md](results/feasibility_tests/SUMMARY.md)**.
+
+| Test | Question | Answer |
+|---|---|---|
+| 1 | Can a surrogate predict the metrics, especially QI? | **Yes, on shapes like the dataset.** A neural net gets R² 0.92–0.99 and tracks QI for the best designs; boosted trees don't |
+| 4 | Can cheap VMEC++ stand in for the expensive version? | **As a filter, yes.** Very low fidelity is 40× faster (3 s) and ranks designs the same, but its errors (~0.06) are too big for the final verdict |
+| 3 | Can shapes be compressed without changing the physics? | **With a VAE, yes.** At 16 numbers it rebuilds designs that all still solve and generates valid shapes ~80% of the time (PCA: 26–52%). But it blurs QI by ~0.2–0.35 in log10 |
+| 2, 2b | Does searching on the surrogate, then checking once, find better real designs? | **No.** Most searched shapes break in VMEC++ and none were feasible. The search lands on unfamiliar shapes where the surrogate is confidently wrong (mirror ratio predicted ~0.05, actually 1.4–2.4) |
+
+**The encouraging sign:** in a follow-up check, the first 10–25% of a search step made
+the real design better about half the time.
+
+**What changes in the plan:**
+
+- **Physics in the loop is the core of the method, not an add-on.** Take small steps with
+  the surrogate, check them with very low fidelity VMEC++, add the results to the training
+  data, retrain, and repeat. Confirm the best at high fidelity.
+- **Search in a VAE latent space** to stay on shapes VMEC++ can solve, then refine
+  finalists in the full coefficients (the VAE blurs QI too much for the last step).
+- **Mirror ratio is the surrogate's worst blind spot** on new shapes, then QI and vacuum
+  well. Disagreement between ensemble models didn't flag the errors, so we need a better
+  safety check (e.g. a trust region around evaluated designs).
+
+---
+
 ## The plan
 
 ### Objective
@@ -175,7 +204,9 @@ violation) against evaluations spent, compared with the baseline. Still a comple
 3. **Physics in the loop.** Run real VMEC++ on the top ~100 candidates, add the results
    to the training data, retrain, and repeat a few rounds. This is needed because the
    dataset has no feasible designs, so the surrogates are guessing exactly where we care
-   most. Each round is about an hour on a laptop.
+   most. Each round is about an hour on a laptop. The feasibility tests confirmed this is
+   essential: steps must be small, and the surrogate must be retrained on what VMEC++
+   says about the new shapes.
 4. **Compare with the baseline.** Run ALM-NGOpt with the same evaluation budget and
    re-score its outputs at high fidelity.
 
@@ -245,6 +276,7 @@ Run from the repo root with the `stellarator` env active. Each script's docstrin
 | `scripts/count_feasible.py` | Pass rate of each requirement across the dataset | ~1 min |
 | `scripts/check_feasibility.py` | Feasibility counts with the benchmark's own function, all 3 benchmarks | ~2 min |
 | `scripts/time_eval.py` | Times one official evaluation | ~2 min |
+| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE) | 5–60 min each |
 
 The first data script downloads the dataset (~600 MB) into the Hugging Face cache.
 

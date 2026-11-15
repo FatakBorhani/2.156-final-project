@@ -146,9 +146,12 @@ optimization. (`results/why_infeasible.json`, `scripts/why_infeasible.py`)
 ### 4. The baseline optimizer is very expensive
 
 The paper's baseline (augmented Lagrangian + Nevergrad, "ALM-NGOpt") script runs up to
-**~1.8 million evaluations** at very low fidelity with 48 parallel workers: roughly
-**1,000–3,000 CPU-hours**. That's why "same result, far fewer evaluations" is a
-meaningful claim. It also means we can't rerun the full baseline on a laptop.
+**~1.8 million evaluations** at very low fidelity. The paper splits Benchmark 3 into four
+runs (aspect ratio at most 6, 8, 10, 12), each on a **96-vCPU machine for 15–24 hours**:
+roughly **1,400–2,300 CPU-hours per run**. It found feasible designs at aspect ratio 8,
+10 and 12, but not 6 (worst violation 0.104) ([paper](https://arxiv.org/html/2506.19583v2),
+Table 5). That's why "same result, far fewer evaluations" is a meaningful claim. It also
+means we can't rerun the full baseline on a laptop.
 
 ---
 
@@ -165,6 +168,7 @@ field periods. Full write-up, numbers and figures:
 | 3 | Can shapes be compressed without changing the physics? | **With a VAE, yes.** At 16 numbers it rebuilds designs that all still solve and generates valid shapes ~80% of the time (PCA: 26–52%). But it blurs QI by ~0.2–0.35 in log10 |
 | 2, 2b | Does searching on the surrogate, then checking once, find better real designs? | **No.** Most searched shapes break in VMEC++ and none were feasible. The search lands on unfamiliar shapes where the surrogate is confidently wrong (mirror ratio predicted ~0.05, actually 1.4–2.4) |
 | 5 | Does a small physics-in-the-loop search work? | **Yes.** In 1,600 cheap VMEC++ runs per method, it found designs about **twice as close to feasible** as anything in the dataset (worst violation 0.203 → **0.096**). VAE steps did best; surrogate + PCA steps were no better than random steps. Nothing feasible yet |
+| 6 | Can a longer, focused push reach feasible? | **No.** Best 0.096 → **0.078**, then stuck: no small step improves any of the 5 best designs, which each still fail 3–5 requirements by ~0.08–0.15. Reaching feasible needs a stronger constrained optimizer or new starting points |
 
 **Test 5 in one picture:** median distance to feasible over 20 seed designs, for three
 search methods with the same VMEC++ budget. Lower is better.
@@ -184,6 +188,9 @@ search methods with the same VMEC++ budget. Lower is better.
 - **Always compare against random steps.** In Test 5 the surrogate with PCA steps didn't
   beat plain trial and error. The VAE did, though partly because its steps were bigger.
   That comparison is our honest "does ML help" test.
+- **Local polishing stalls around 0.08 (Test 6).** Next: warm-start the paper's own
+  optimizer (ALM-NGOpt) from our best designs and count how many runs it needs to reach
+  feasible, compared with its usual start.
 
 ---
 

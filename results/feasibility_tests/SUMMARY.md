@@ -1,6 +1,6 @@
 # Plan feasibility tests: results so far
 
-*Run 2026-11-14 to 15 on Leif's M3 Max. These are quick, throwaway checks of the plan's
+*Run 2026-11-14 to 16 on Leif's M3 Max. These are quick, throwaway checks of the plan's
 riskiest assumptions, not the project's real surrogates or search. All use the 68,191
 valid designs with 3 field periods.*
 
@@ -12,13 +12,15 @@ valid designs with 3 field periods.*
 | 3 | Can shapes be compressed (PCA vs. VAE) without changing the physics? | ✅ done | **VAE yes**, PCA only at 32 dims. Both blur fine QI detail |
 | 4 | Can low-fidelity VMEC++ stand in for high fidelity? | ✅ done | **Yes, as a filter.** Not for the final score |
 | 5 | Does a small physics-in-the-loop search work, and does the surrogate help? | ✅ done | **The loop works:** closest design 0.203 → **0.096**. VAE steps best; surrogate + PCA steps no better than random |
+| 6 | Can a longer, focused push reach a feasible design? | ✅ done | **No.** Best 0.096 → **0.078**, then stalled. The designs sit at a local optimum where 3–5 requirements fail together |
 
 **Bottom line:** the pieces work (surrogate on known shapes, VAE latent space, cheap
 VMEC++ filter), but "optimize the surrogate, then check once" does not. The search walks
 off the data, where the surrogate is confidently wrong. **Physics-in-the-loop with small
 steps and retraining is required, not optional.** Test 5 confirms it: a small loop
-roughly halved the closest design's gap to feasible on a laptop in under an hour. No
-design is feasible yet. Details below.
+roughly halved the closest design's gap to feasible on a laptop in under an hour. Test 6
+showed that local polishing then stalls at ~0.08: to reach feasible we need a better
+constrained optimizer or different starting points, not more of the same. Details below.
 
 ## Test 1: surrogate accuracy
 
@@ -237,6 +239,52 @@ at high fidelity.
 - **Very low fidelity isn't enough to finish.** 10 of 60 final designs that solved at very
   low fidelity failed at high fidelity. Check several candidates per seed at high fidelity.
 
+## Test 6: a focused push for a feasible design
+
+`scripts/feasibility_tests/push_test.py` → `push.json`, `push.png`, `push_history.csv`, `push_checked_designs.jsonl`
+
+Starts from Test 5's 5 best designs (high fidelity 0.096–0.150). Two arms, same budget:
+random PCA steps vs. surrogate-scored VAE steps. 30 rounds × 16 designs each = 2,400
+very-low-fidelity runs per arm, plus 45 high-fidelity checks per arm (the 3 best
+unchecked candidates per design every 10 rounds). Two changes from Test 5:
+
+- **Per-requirement penalties:** minimize the weighted sum of each requirement's shortfall
+  (aiming 0.02 past each limit), multiplying a requirement's weight by 1.5 every round it
+  still fails.
+- **High-fidelity checks during the run**, since only those can confirm a pass.
+
+75 min on the laptop.
+
+| Starting design (high fidelity) | Random steps | Surrogate + VAE steps |
+|---|---|---|
+| 0.096 | 0.088 | **0.078** |
+| 0.122 | 0.118 | **0.112** |
+| 0.132 | **0.111** | 0.135 |
+| 0.141 | 0.144 | **0.123** |
+| 0.150 | 0.156 | **0.149** |
+| Feasible | 0 | 0 |
+| Very-low-fidelity runs VMEC++ couldn't solve | 8% | 17% |
+
+![Test 6](push.png)
+
+- **No feasible design.** The best is 0.078 (QI 0.072, mirror 0.078, vacuum well 0.003),
+  down from 0.096. Most of the gain came in the first 10 rounds.
+- **The search stalled at a local optimum.** Every design's step size shrank to the
+  minimum by round 20–30: no small step in any direction improved it. The remaining
+  shortfalls are spread over 3–5 requirements at once, around 0.08–0.15 each. That's the
+  QI / mirror / vacuum-well tradeoff wall.
+- **My penalty scheme didn't do its job.** Because almost every requirement kept failing,
+  every weight grew at the same rate and hit the cap, so it reduced to "minimize the sum
+  of shortfalls". It never shifted effort toward the stubborn requirement. A proper
+  augmented Lagrangian scales each multiplier by *how much* a requirement fails.
+- **The surrogate learned the local region almost perfectly** (prediction error 0.023 →
+  0.002), but that didn't help: the limit is the landscape, not the prediction.
+- **VAE steps still edged out random steps** (4 of 5 designs), but with twice the failure
+  rate, and the step-size caveat from Test 5 still applies.
+- **The cheap simulator is now as noisy as our progress.** On 77 designs checked at both
+  fidelities, very low vs. high fidelity differed by 0.017 on average (max 0.058). Per-round
+  gains near the end are smaller than that, so the loop is partly steering on noise.
+
 ## What this means for the plan
 
 1. **Surrogate:** a neural net is viable for QI *on known shapes*. Boosted trees are a
@@ -260,3 +308,10 @@ at high fidelity.
    more finalists at high fidelity.
 8. **The surrogate must earn its place.** Against the random-step control, it hasn't yet.
    Keep the control in every experiment: it's our honest "does ML help" comparison.
+9. **Local polishing has hit a wall at ~0.08 (Test 6).** Reaching feasible needs one of:
+   a real constrained optimizer (the paper's ALM-NGOpt, warm-started from our best
+   designs, would be a clean test: how many runs does it need from our designs vs. from
+   its usual start?); more diverse starting points (other aspect ratios, other seeds);
+   or bigger, smarter moves than a local trust region allows.
+10. **Near the finish, very low fidelity is too noisy to steer by.** Switch the final
+    stage to low or high fidelity.

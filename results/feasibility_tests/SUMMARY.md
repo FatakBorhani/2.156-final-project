@@ -1,6 +1,6 @@
 # Plan feasibility tests: results so far
 
-*Run 2026-11-14 to 15 on Leif's M3 Max. These are quick, throwaway checks of the plan's
+*Run 2026-11-14 to 16 on Leif's M3 Max. These are quick, throwaway checks of the plan's
 riskiest assumptions, not the project's real surrogates or search. All use the 68,191
 valid designs with 3 field periods.*
 
@@ -14,6 +14,7 @@ valid designs with 3 field periods.*
 | 5 | Does a small physics-in-the-loop search work, and does the surrogate help? | ✅ done | **The loop works:** closest design 0.203 → **0.096**. VAE steps best; surrogate + PCA steps no better than random |
 | 6 | Can a longer, focused push reach a feasible design? | ✅ done | **No.** Best 0.096 → **0.078**, then stalled. The designs sit at a local optimum where 3–5 requirements fail together |
 | 7 | Does the paper's optimizer (ALM-NGOpt) finish the job if started from our best design? | ✅ done | **No, not at a budget we can afford.** 5,400 runs from each of 3 starts: nothing feasible. From our design it found an equally close design with much higher L∇B; from the dataset's best it reached 0.126; from the paper's start 0.72 |
+| 8 | Does ALM-NGOpt, retuned to polish, get closer? | ✅ done | **Much closer, not yet feasible.** Best 0.078 → **0.033** at high fidelity (QI and mirror ratio each ~0.03 short). Still improving when the budget ran out |
 
 **Bottom line:** the pieces work (surrogate on known shapes, VAE latent space, cheap
 VMEC++ filter), but "optimize the surrogate, then check once" does not. The search walks
@@ -24,7 +25,8 @@ showed that local polishing then stalls at ~0.08: to reach feasible we need a be
 constrained optimizer or different starting points, not more of the same. Test 7 tried
 the paper's constrained optimizer from our best design: in 5,400 runs it didn't get closer
 to feasible, so at a matched, laptop-sized budget our loop (0.078) beats it (0.126 from
-the dataset's best, 0.72 from its own start). Details below.
+the dataset's best, 0.72 from its own start). Test 8 retuned that optimizer to polish
+instead of explore and more than halved the gap: **0.078 → 0.033**. Details below.
 
 ## Test 1: surrogate accuracy
 
@@ -324,6 +326,55 @@ logic is unchanged. The best designs per start were re-checked at high fidelity.
 - **Very slow shapes:** from the dataset start, 645 runs took over a minute each (up to
   3 min), so that arm took 2.2 h instead of ~35 min.
 
+## Test 8: ALM-NGOpt retuned to polish
+
+`scripts/feasibility_tests/polish_test.py` → `polish.json`, `polish.png`, `polish_checked_designs.jsonl`
+
+Reading the package's ALM code showed why Test 7 wandered: the search box never shrinks
+(`bounds_reduction_factor` is unused, so it stays at ±0.33), constraints are in raw units
+(a mirror-ratio shortfall weighs ~10× less than the same QI shortfall),
+`penalty_parameters_initial` is ignored, and it always accepts Nevergrad's recommendation
+even when that's worse. Test 8 keeps the same ALM + NGOpt machinery and changes:
+
+- constraints = the benchmark's own normalized violations + a 0.02 margin, plus aspect
+  ratio ≤ 12
+- objective (20 − L∇B)/20 × 0.05: only a tie-breaker until feasible
+- penalties start at 100; box ±0.05 that shrinks ×0.7 whenever an outer iteration doesn't
+  improve (min 0.005)
+- each outer iteration keeps its best evaluated point
+- 20 outer iterations × 300 runs = 6,000 very-low-fidelity runs per start
+
+7 starts: the best design from each of Test 6's 5 seeds, plus Test 7's two best. The 6
+closest designs per start were re-checked at high fidelity. 6.0 h overnight.
+
+| Start (high fidelity) | Best, very low fidelity | Best, high fidelity | L∇B | AR |
+|---|---|---|---|---|
+| Test 7, ours (0.078) | 0.033 | **0.033** | 8.3 | 12.2 |
+| Test 6, seed 2 (0.111) | **0.021** | 0.044 | 7.5 | 12.3 |
+| Test 6, seed 0 (0.078) | 0.035 | 0.046 | 4.2 | 11.0 |
+| Test 6, seed 4 (0.149) | 0.056 | 0.080 | 8.3 | 10.7 |
+| Test 6, seed 1 (0.112) | 0.085 | 0.084 | 0.1 | 9.3 |
+| Test 7, dataset (0.126) | 0.085 | 0.100 | 8.2 | 12.2 |
+| Test 6, seed 3 (0.123) | 0.147 | not checked | | |
+
+![Test 8](polish.png)
+
+- **No feasible design, but the best gap more than halved: 0.078 → 0.033.** That design
+  misses only QI (0.031) and mirror ratio (0.033), plus vacuum well by a hair (0.004),
+  and keeps a good L∇B (8.3).
+- **The tuning was the difference.** From the same start, the paper's settings (Test 7)
+  made no progress in 5,400 runs; the polishing settings reached 0.033 in 6,000.
+- **The best runs were still improving** when the budget ran out (best start: 0.036 at
+  3,000 runs, 0.025 at 4,500, 0.021 at 6,000, very low fidelity), but the box had shrunk
+  to its minimum. 3 of 7 starts barely moved.
+- **The cheap simulator's error is now the bottleneck.** Seed 2's best was 0.021 at very
+  low fidelity but 0.044 at high. The 0.02 margin wasn't enough there, though for the best
+  start the two fidelities agreed (0.033 vs. 0.033).
+- **L∇B was sacrificed on some starts** (seed 1 fell to 0.1, seed 0 from 5.1 to 4.2): with
+  the objective only a tie-breaker, the optimizer gives it up freely. Fine for reaching
+  feasible, but the final score needs it back.
+- Aspect ratios ended slightly over 12 (Benchmark 3 itself has no aspect-ratio limit).
+
 ## What this means for the plan
 
 1. **Surrogate:** a neural net is viable for QI *on known shapes*. Boosted trees are a
@@ -359,3 +410,8 @@ logic is unchanged. The best designs per start were re-checked at high fidelity.
     baseline comparison. To actually reach feasible, try: ALM with a small search box
     (e.g. ±0.05 instead of ±0.33) and higher starting penalties, so it polishes instead of
     exploring; or many more ALM iterations (the paper's full budget is ~100× ours).
+12. **A tuned constrained optimizer is the finisher (Test 8).** Polishing ALM halved the
+    best gap to 0.033 overnight and was still improving. To cross the line: continue the
+    best 2–3 designs with a reset box, and run the last stretch at high fidelity (or with
+    a bigger margin), since very-low-fidelity error (~0.02) is now as big as the remaining
+    gap. Then bring L∇B back up while staying feasible.

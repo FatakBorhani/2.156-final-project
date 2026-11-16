@@ -87,7 +87,8 @@ def ours_status(t: dict) -> dict:
     return {"ids": set(t["id"][ours].astype(str)), "novel_pass": nov}
 
 
-def propose(proposer: str, n: int, seed: int, ours: dict) -> list[dict]:
+def propose(proposer: str, n: int, seed: int, ours: dict, layers: int = 1,
+            window: float = 1.0) -> list[dict]:
     import perturb
     import surface
     if proposer == "random":
@@ -95,12 +96,12 @@ def propose(proposer: str, n: int, seed: int, ours: dict) -> list[dict]:
     if proposer == "surface":
         return surface.propose(n, seed)
     if proposer == "blend":
-        return surface.blend(n, seed, ours)
+        return surface.blend(n, seed, ours, layers=layers, window=window)
     raise ValueError(proposer)
 
 
 def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: int, r: int,
-         pub: dict) -> list[dict]:
+         pub: dict, layers: int = 1, window: float = 1.0) -> list[dict]:
     """One round's batch: propose, keep novel candidates, then screen or pick at random."""
     training_data.build()
     t = arm_view(load_table(), name); st = ours_status(t)
@@ -108,7 +109,8 @@ def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: in
     fA = np.r_[pub["A"], t["A"][mine]]; fL = np.r_[pub["L"], t["L"][mine]]
     ours = {k: t[k][mine] for k in ("X", "A", "L", "id")}
 
-    cands = [d for d in propose(proposer, pool, seed * 1000 + r, ours) if d["id"] not in st["ids"]]
+    cands = [d for d in propose(proposer, pool, seed * 1000 + r, ours, layers, window)
+             if d["id"] not in st["ids"]]
     V = np.array([to_vector(d["boundary"]) for d in cands])
     A, nov = aspect_ratio(V), nearest_public(V)
     done = t["X"][t["source"] == "ours"]          # don't re-simulate near-copies of our own
@@ -144,7 +146,7 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 
 def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: int,
-        seed: int, workers: int, dry_run: bool) -> None:
+        seed: int, workers: int, dry_run: bool, layers: int = 1, window: float = 1.0) -> None:
     import run_sims
     pub = load_public()
     LOGS.mkdir(parents=True, exist_ok=True)
@@ -154,14 +156,15 @@ def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: i
         if r in logged:
             continue
         infile = DATA / f"loop_{name}_r{r}.jsonl"
+        args = (name, proposer, screen, batch, pool, seed, r, pub, layers, window)
         if dry_run:                               # kept out of DATA so arm_view never sees it
-            write_jsonl(LOGS / f"dryrun_{name}_r{r}.jsonl", pick(name, proposer, screen, batch, pool, seed, r, pub))
+            write_jsonl(LOGS / f"dryrun_{name}_r{r}.jsonl", pick(*args))
             return
         if infile.exists():                       # interrupted mid-round: finish the same picks
             picks = [json.loads(x) for x in infile.open()]
             print(f"[{name} round {r}] resuming {len(picks)} picks from {infile.name}", flush=True)
         else:
-            picks = pick(name, proposer, screen, batch, pool, seed, r, pub)
+            picks = pick(*args)
             write_jsonl(infile, picks)
         rows = run_sims.run(picks, DATA / "runs" / f"loop_{name}.jsonl", workers=workers)
         npass = sum(x["feasible"] for x in rows if x["id"] in {d["id"] for d in picks})
@@ -189,8 +192,13 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--layers", type=int, default=1,
+                    help="blend: parents from the first k non-dominated layers (1 = front only)")
+    ap.add_argument("--window", type=float, default=1.0,
+                    help="blend: largest aspect-ratio gap between the two parents")
     a = ap.parse_args()
-    run(a.name, a.proposer, a.screen, a.rounds, a.batch, a.pool, a.seed, a.workers, a.dry_run)
+    run(a.name, a.proposer, a.screen, a.rounds, a.batch, a.pool, a.seed, a.workers, a.dry_run,
+        a.layers, a.window)
 
 
 if __name__ == "__main__":

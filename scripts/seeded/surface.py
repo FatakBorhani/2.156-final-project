@@ -87,12 +87,12 @@ def propose(n: int, seed: int) -> list[dict]:
     return _finish(out, rng)
 
 
-def _blends(rng, X, A, fam, ids, front, n, seed) -> list[dict]:
+def _blends(rng, X, A, fam, ids, front, n, seed, window=1.0) -> list[dict]:
     out = []
     for _ in range(n):
         region, parents = _pick_region(rng, front, A)
         a = parents[rng.integers(len(parents))]
-        others = front[(fam[front] != fam[a]) & (np.abs(A[front] - A[a]) < 1.0)]
+        others = front[(fam[front] != fam[a]) & (np.abs(A[front] - A[a]) < window)]
         if len(others) == 0:
             others = front[fam[front] != fam[a]]
         b = others[np.argmin(np.abs(A[others] - A[a]))] if len(others) < 3 else others[rng.integers(len(others))]
@@ -112,10 +112,26 @@ def _finish(out: list[dict], rng) -> list[dict]:
     return [out[i] for i in rng.permutation(len(out))]
 
 
-def blend(n: int, seed: int, ours: dict | None = None) -> list[dict]:
+def layer_mask(A: np.ndarray, L: np.ndarray, k: int) -> np.ndarray:
+    """The first k non-dominated layers: k = 1 is the front, k = 2 adds the front of the rest."""
+    keep, left = np.zeros(len(A), bool), np.arange(len(A))
+    for _ in range(k):
+        f = front_mask(A[left], L[left])
+        keep[left[f]] = True
+        left = left[~f]
+    return keep
+
+
+def blend(n: int, seed: int, ours: dict | None = None, layers: int = 1,
+          window: float = 1.0) -> list[dict]:
     """Blends only, from the *current* front: public designs plus `ours` (our novel passing
     designs: arrays X, A, L, id). Our designs join as one-member families, so a new design
-    can be blended again with a public one: crossover that compounds across rounds."""
+    can be blended again with a public one: crossover that compounds across rounds.
+
+    Widening (defaults reproduce the original): `layers` takes parents from the first k
+    non-dominated layers instead of the front only; `window` is the largest aspect-ratio
+    gap between the two parents. With layers=1 and window=1 a fresh arm has only ~300
+    novel candidates, which the arm comparison used up in ~5 rounds of 60."""
     rng = np.random.default_rng(seed)
     idx = load()
     X, A, L, fam, ids = idx["X"], idx["A"], idx["L"], idx["family"], idx["id"].astype(str)
@@ -123,8 +139,8 @@ def blend(n: int, seed: int, ours: dict | None = None) -> list[dict]:
         k = len(ours["X"])
         X, A, L = np.r_[X, ours["X"]], np.r_[A, ours["A"]], np.r_[L, ours["L"]]
         fam, ids = np.r_[fam, -1 - np.arange(k)], np.r_[ids, ours["id"].astype(str)]
-    front = np.flatnonzero(front_mask(A, L))
-    return _finish(_blends(rng, X, A, fam, ids, front, n, seed), rng)
+    front = np.flatnonzero(layer_mask(A, L, layers))
+    return _finish(_blends(rng, X, A, fam, ids, front, n, seed, window), rng)
 
 
 def main() -> None:

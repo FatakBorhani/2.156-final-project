@@ -1,0 +1,176 @@
+{
+  "n_train": 54552,
+  "n_test": 13639,
+  "boosted_trees": {
+    "train_seconds": 182,
+    "per_metric": {
+      "log10_qi": {
+        "r2": 0.948,
+        "mae": 0.053,
+        "std_of_true": 0.4486
+      },
+      "abs_iota": {
+        "r2": 0.994,
+        "mae": 0.0056,
+        "std_of_true": 0.1501
+      },
+      "mirror": {
+        "r2": 0.971,
+        "mae": 0.0131,
+        "std_of_true": 0.1514
+      },
+      "flux_compression": {
+        "r2": 0.945,
+        "mae": 0.0324,
+        "std_of_true": 0.2953
+      },
+      "vacuum_well": {
+        "r2": 0.986,
+        "mae": 0.008,
+        "std_of_true": 0.1684
+      },
+      "L_gradB": {
+        "r2": 0.924,
+        "mae": 0.3052,
+        "std_of_true": 2.4769
+      },
+      "aspect_ratio": {
+        "r2": 0.996,
+        "mae": 0.0618,
+        "std_of_true": 1.8573
+      }
+    },
+    "qi_in_the_region_we_need": {
+      "true_log10_qi_below_-3.0": {
+        "n_test_designs": 131,
+        "mae": 0.208,
+        "mean_error (+ = predicts worse QI than true)": 0.199
+      },
+      "true_log10_qi_below_-3.25": {
+        "n_test_designs": 16,
+        "mae": 0.309,
+        "mean_error (+ = predicts worse QI than true)": 0.309
+      }
+    },
+    "pass_fail_accuracy": {
+      "log10_qi": {
+        "all": 1.0,
+        "within_20pct_of_limit": 0.994,
+        "n_within_20pct": 342
+      },
+      "abs_iota": {
+        "all": 0.972,
+        "within_20pct_of_limit": 0.922,
+        "n_within_20pct": 4805
+      },
+      "mirror": {
+        "all": 0.971,
+        "within_20pct_of_limit": 0.82,
+        "n_within_20pct": 2013
+      },
+      "flux_compression": {
+        "all": 0.973,
+        "within_20pct_of_limit": 0.949,
+        "n_within_20pct": 6391
+      },
+      "vacuum_well": {
+        "all": 0.987,
+        "within_20pct_of_limit": 0.707,
+        "n_within_20pct": 273
+      }
+    },
+    "worst_violation": {
+      "spearman_all": 0.989,
+      "mae_for_designs_with_true_worst_le_0.5": 0.063,
+      "n_designs_with_true_worst_le_0.5": 223,
+      "recall_of_true_100_closest_in_predicted_top_500": 0.89,
+      "recall_of_true_100_closest_in_predicted_top_1000": 0.98
+    }
+  },
+  "mlp": {
+    "train_seconds": 136,
+    "per_metric": {
+      "log10_qi": {
+        "r2": 0.957,
+        "mae": 0.0463,
+        "std_of_true": 0.4486
+      },
+      "abs_iota": {
+        "r2": 0.993,
+        "mae": 0.0061,
+        "std_of_true": 0.1501
+      },
+      "mirror": {
+        "r2": 0.974,
+        "mae": 0.0116,
+        "std_of_true": 0.1514
+      },
+      "flux_compression": {
+        "r2": 0.954,
+        "mae": 0.0299,
+        "std_of_true": 0.2953
+      },
+      "vacuum_well": {
+        "r2": 0.988,
+        "mae": 0.0076,
+        "std_of_true": 0.1684
+      },
+      "L_gradB": {
+        "r2": 0.916,
+        "mae": 0.2966,
+        "std_of_true": 2.4769
+      },
+      "aspect_ratio": {
+        "r2": 0.989,
+        "mae": 0.0877,
+        "std_of_true": 1.8573
+      }
+    },
+    "qi_in_the_region_we_need": {
+      "true_log10_qi_below_-3.0": {
+        "n_test_designs": 131,
+        "mae": 0.119,
+        "mean_error (+ = predicts worse QI than true)": 0.054
+      },
+      "true_log10_qi_below_-3.25": {
+        "n_test_designs": 16,
+        "mae": 0.118,
+        "mean_error (+ = predicts worse QI than true)": 0.091
+      }
+    },
+    "pass_fail_accuracy": {
+      "log10_qi": {
+        "all": 1.0,
+        "within_20pct_of_limit": 0.991,
+        "n_within_20pct": 342
+      },
+      "abs_iota": {
+        "all": 0.971,
+        "within_20pct_of_limit": 0.92,
+        "n_within_20pct": 4805
+      },
+      "mirror": {
+        "all": 0.976,
+        "within_20pct_of_limit": 0.853,
+        "n_within_20pct": 2013
+      },
+      "flux_compression": {
+        "all": 0.975,
+        "within_20pct_of_limit": 0.951,
+        "n_within_20pct": 6391
+      },
+      "vacuum_well": {
+        "all": 0.986,
+        "within_20pct_of_limit": 0.692,
+        "n_within_20pct": 273
+      }
+    },
+    "worst_violation": {
+      "spearman_all": 0.99,
+      "mae_for_designs_with_true_worst_le_0.5": 0.066,
+      "n_designs_with_true_worst_le_0.5": 223,
+      "recall_of_true_100_closest_in_predicted_top_500": 0.95,
+      "recall_of_true_100_closest_in_predicted_top_1000": 0.99
+    }
+  }
+}

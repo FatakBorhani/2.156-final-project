@@ -1,0 +1,154 @@
+{
+  "rounds": 10,
+  "per_round_per_seed": 8,
+  "n_seeds": 20,
+  "trust_region": {
+    "start": 0.03,
+    "min": 0.003,
+    "max": 0.3,
+    "grow": 1.5,
+    "shrink": 0.5
+  },
+  "wall_minutes": 1.7,
+  "control": {
+    "vmec_evaluations": 1600,
+    "vmec_failed": 212,
+    "median_best_worst_by_round_vlo": [
+      0.3605,
+      0.3315,
+      0.2629,
+      0.2629,
+      0.2478,
+      0.2478,
+      0.2478,
+      0.2437,
+      0.2363,
+      0.2363,
+      0.2333
+    ],
+    "seeds_improved_vlo": 20,
+    "median_change_vlo": -0.134,
+    "feasible_vlo": 0,
+    "seeds_improved_hi": 17,
+    "median_change_hi": -0.117,
+    "best_final_worst_hi": 0.132,
+    "feasible_hi": 0,
+    "hi_check_failed": 3,
+    "by_group_median_change_hi": {
+      "closest": -0.052,
+      "passes_QI": -0.522,
+      "passes_other_four": -0.162
+    },
+    "median_step_std_units": 0.188
+  },
+  "pca": {
+    "vmec_evaluations": 1600,
+    "vmec_failed": 201,
+    "median_best_worst_by_round_vlo": [
+      0.3605,
+      0.2826,
+      0.2719,
+      0.2717,
+      0.2717,
+      0.2562,
+      0.2471,
+      0.2449,
+      0.2436,
+      0.2429,
+      0.242
+    ],
+    "seeds_improved_vlo": 20,
+    "median_change_vlo": -0.149,
+    "feasible_vlo": 0,
+    "seeds_improved_hi": 16,
+    "median_change_hi": -0.094,
+    "best_final_worst_hi": 0.141,
+    "feasible_hi": 0,
+    "hi_check_failed": 4,
+    "by_group_median_change_hi": {
+      "closest": -0.031,
+      "passes_QI": -0.694,
+      "passes_other_four": -0.152
+    },
+    "median_step_std_units": 0.176,
+    "surrogate_error_worst_by_round": [
+      0.064,
+      0.092,
+      0.044,
+      0.044,
+      0.024,
+      0.017,
+      0.018,
+      0.011,
+      0.025,
+      0.015
+    ],
+    "surrogate_bias_worst_by_round (actual - predicted)": [
+      0.002,
+      0.092,
+      0.043,
+      0.032,
+      0.023,
+      0.014,
+      0.016,
+      0.01,
+      0.025,
+      0.015
+    ]
+  },
+  "vae": {
+    "vmec_evaluations": 1600,
+    "vmec_failed": 332,
+    "median_best_worst_by_round_vlo": [
+      0.3605,
+      0.3119,
+      0.2616,
+      0.2246,
+      0.2125,
+      0.1963,
+      0.1951,
+      0.1845,
+      0.1831,
+      0.1737,
+      0.1735
+    ],
+    "seeds_improved_vlo": 20,
+    "median_change_vlo": -0.128,
+    "feasible_vlo": 0,
+    "seeds_improved_hi": 17,
+    "median_change_hi": -0.093,
+    "best_final_worst_hi": 0.096,
+    "feasible_hi": 0,
+    "hi_check_failed": 3,
+    "by_group_median_change_hi": {
+      "closest": -0.075,
+      "passes_QI": -0.689,
+      "passes_other_four": -0.062
+    },
+    "median_step_std_units": 0.694,
+    "surrogate_error_worst_by_round": [
+      0.01,
+      0.016,
+      0.022,
+      0.029,
+      0.026,
+      0.025,
+      0.039,
+      0.022,
+      0.019,
+      0.013
+    ],
+    "surrogate_bias_worst_by_round (actual - predicted)": [
+      0.002,
+      0.005,
+      0.02,
+      0.028,
+      0.023,
+      0.021,
+      0.039,
+      0.022,
+      0.017,
+      0.013
+    ]
+  }
+}

@@ -146,9 +146,54 @@ optimization. (`results/why_infeasible.json`, `scripts/why_infeasible.py`)
 ### 4. The baseline optimizer is very expensive
 
 The paper's baseline (augmented Lagrangian + Nevergrad, "ALM-NGOpt") script runs up to
-**~1.8 million evaluations** at very low fidelity with 48 parallel workers: roughly
-**1,000–3,000 CPU-hours**. That's why "same result, far fewer evaluations" is a
-meaningful claim. It also means we can't rerun the full baseline on a laptop.
+**~1.8 million evaluations** at very low fidelity. The paper splits Benchmark 3 into four
+runs (aspect ratio at most 6, 8, 10, 12), each on a **96-vCPU machine for 15–24 hours**:
+roughly **1,400–2,300 CPU-hours per run**. It found feasible designs at aspect ratio 8,
+10 and 12, but not 6 (worst violation 0.104) ([paper](https://arxiv.org/html/2506.19583v2),
+Table 5). That's why "same result, far fewer evaluations" is a meaningful claim. It also
+means we can't rerun the full baseline on a laptop.
+
+---
+
+## What the feasibility tests showed (Nov 14–15)
+
+Quick, throwaway checks of the plan's riskiest assumptions, on the 68k designs with 3
+field periods. Full write-up, numbers and figures:
+**[results/feasibility_tests/SUMMARY.md](results/feasibility_tests/SUMMARY.md)**.
+
+| Test | Question | Answer |
+|---|---|---|
+| 1 | Can a surrogate predict the metrics, especially QI? | **Yes, on shapes like the dataset.** A neural net gets R² 0.92–0.99 and tracks QI for the best designs; boosted trees don't |
+| 4 | Can cheap VMEC++ stand in for the expensive version? | **As a filter, yes.** Very low fidelity is 40× faster (3 s) and ranks designs the same, but its errors (~0.06) are too big for the final verdict |
+| 3 | Can shapes be compressed without changing the physics? | **With a VAE, yes.** At 16 numbers it rebuilds designs that all still solve and generates valid shapes ~80% of the time (PCA: 26–52%). But it blurs QI by ~0.2–0.35 in log10 |
+| 2, 2b | Does searching on the surrogate, then checking once, find better real designs? | **No.** Most searched shapes break in VMEC++ and none were feasible. The search lands on unfamiliar shapes where the surrogate is confidently wrong (mirror ratio predicted ~0.05, actually 1.4–2.4) |
+| 5 | Does a small physics-in-the-loop search work? | **Yes.** In 1,600 cheap VMEC++ runs per method, it found designs about **twice as close to feasible** as anything in the dataset (worst violation 0.203 → **0.096**). VAE steps did best; surrogate + PCA steps were no better than random steps. Nothing feasible yet |
+| 6 | Can a longer, focused push reach feasible? | **No.** Best 0.096 → **0.078**, then stuck: no small step improves any of the 5 best designs, which each still fail 3–5 requirements by ~0.08–0.15. Reaching feasible needs a stronger constrained optimizer or new starting points |
+| 7 | Does the paper's optimizer (ALM-NGOpt) finish the job from our best design? | **No, not at a budget we can afford.** 5,400 cheap runs from each of 3 starts, nothing feasible. From the same budget: its usual start reached 0.72, the dataset's best 0.126, our design stayed at 0.078 (but found a version with L∇B 9.1 instead of 5.1). **At a matched budget, our loop beats the baseline** |
+
+**Test 5 in one picture:** median distance to feasible over 20 seed designs, for three
+search methods with the same VMEC++ budget. Lower is better.
+
+![Test 5](results/feasibility_tests/loop.png)
+
+**What changes in the plan:**
+
+- **Physics in the loop is the core of the method, not an add-on.** Take small steps with
+  the surrogate, check them with very low fidelity VMEC++, add the results to the training
+  data, retrain, and repeat. Confirm the best at high fidelity. Test 5 shows this works.
+- **Search in a VAE latent space** to stay on shapes VMEC++ can solve, then refine
+  finalists in the full coefficients (the VAE blurs QI too much for the last step).
+- **Mirror ratio is the surrogate's worst blind spot** on new shapes, then QI and vacuum
+  well. Disagreement between ensemble models didn't flag the errors, so we need a better
+  safety check (e.g. a trust region around evaluated designs).
+- **Always compare against random steps.** In Test 5 the surrogate with PCA steps didn't
+  beat plain trial and error. The VAE did, though partly because its steps were bigger.
+  That comparison is our honest "does ML help" test.
+- **Local polishing stalls around 0.08 (Test 6), and the paper's optimizer doesn't break
+  through either (Test 7).** With ~5,000 cheap runs, ALM-NGOpt gets to 0.72 from its usual
+  start and 0.126 from the dataset's best, versus 0.078 for our loop: a good sign for the
+  baseline comparison. Reaching feasible still needs something new: ALM tuned to polish
+  (small search box, high penalties), more diverse starts, or a bigger budget.
 
 ---
 
@@ -175,7 +220,9 @@ violation) against evaluations spent, compared with the baseline. Still a comple
 3. **Physics in the loop.** Run real VMEC++ on the top ~100 candidates, add the results
    to the training data, retrain, and repeat a few rounds. This is needed because the
    dataset has no feasible designs, so the surrogates are guessing exactly where we care
-   most. Each round is about an hour on a laptop.
+   most. Each round is about an hour on a laptop. The feasibility tests confirmed this is
+   essential: steps must be small, and the surrogate must be retrained on what VMEC++
+   says about the new shapes.
 4. **Compare with the baseline.** Run ALM-NGOpt with the same evaluation budget and
    re-score its outputs at high fidelity.
 
@@ -245,6 +292,7 @@ Run from the repo root with the `stellarator` env active. Each script's docstrin
 | `scripts/count_feasible.py` | Pass rate of each requirement across the dataset | ~1 min |
 | `scripts/check_feasibility.py` | Feasibility counts with the benchmark's own function, all 3 benchmarks | ~2 min |
 | `scripts/time_eval.py` | Times one official evaluation | ~2 min |
+| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop, ALM warm start) | 5 min–3 h each |
 
 The first data script downloads the dataset (~600 MB) into the Hugging Face cache.
 

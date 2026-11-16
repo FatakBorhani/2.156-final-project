@@ -1,6 +1,6 @@
 # Plan feasibility tests: results so far
 
-*Run 2026-11-14 to 16 on Leif's M3 Max. These are quick, throwaway checks of the plan's
+*Run 2026-11-14 to 15 on Leif's M3 Max. These are quick, throwaway checks of the plan's
 riskiest assumptions, not the project's real surrogates or search. All use the 68,191
 valid designs with 3 field periods.*
 
@@ -13,6 +13,7 @@ valid designs with 3 field periods.*
 | 4 | Can low-fidelity VMEC++ stand in for high fidelity? | ✅ done | **Yes, as a filter.** Not for the final score |
 | 5 | Does a small physics-in-the-loop search work, and does the surrogate help? | ✅ done | **The loop works:** closest design 0.203 → **0.096**. VAE steps best; surrogate + PCA steps no better than random |
 | 6 | Can a longer, focused push reach a feasible design? | ✅ done | **No.** Best 0.096 → **0.078**, then stalled. The designs sit at a local optimum where 3–5 requirements fail together |
+| 7 | Does the paper's optimizer (ALM-NGOpt) finish the job if started from our best design? | ✅ done | **No, not at a budget we can afford.** 5,400 runs from each of 3 starts: nothing feasible. From our design it found an equally close design with much higher L∇B; from the dataset's best it reached 0.126; from the paper's start 0.72 |
 
 **Bottom line:** the pieces work (surrogate on known shapes, VAE latent space, cheap
 VMEC++ filter), but "optimize the surrogate, then check once" does not. The search walks
@@ -20,7 +21,10 @@ off the data, where the surrogate is confidently wrong. **Physics-in-the-loop wi
 steps and retraining is required, not optional.** Test 5 confirms it: a small loop
 roughly halved the closest design's gap to feasible on a laptop in under an hour. Test 6
 showed that local polishing then stalls at ~0.08: to reach feasible we need a better
-constrained optimizer or different starting points, not more of the same. Details below.
+constrained optimizer or different starting points, not more of the same. Test 7 tried
+the paper's constrained optimizer from our best design: in 5,400 runs it didn't get closer
+to feasible, so at a matched, laptop-sized budget our loop (0.078) beats it (0.126 from
+the dataset's best, 0.72 from its own start). Details below.
 
 ## Test 1: surrogate accuracy
 
@@ -285,6 +289,41 @@ unchecked candidates per design every 10 rounds). Two changes from Test 5:
   fidelities, very low vs. high fidelity differed by 0.017 on average (max 0.058). Per-round
   gains near the end are smaller than that, so the loop is partly steering on noise.
 
+## Test 7: warm-starting the paper's optimizer (ALM-NGOpt)
+
+`scripts/feasibility_tests/alm_warmstart_test.py` → `alm_warmstart.json`, `alm_warmstart.png`, `alm_checked_designs.jsonl`
+
+The paper's Benchmark 3 baseline, run with its exact settings (constellaration v0.2.6
+`launch_alm_mhd_stable_stellarator.py`: very low fidelity, 1,500 runs in the first outer
+iteration, +300 per iteration, search box ±0.33, aspect ratio ≤ 12), from three starts.
+3 outer iterations = 5,400 runs per start (the paper allows up to 50 iterations, roughly
+440k runs). The ALM loop is copied from the package so every run is logged; the optimizer
+logic is unchanged. The best designs per start were re-checked at high fidelity.
+3.1 h on the laptop (12 workers).
+
+| Start | Start, worst violation | Best found in 5,400 runs (high fidelity) | Feasible |
+|---|---|---|---|
+| **Ours** (Test 6 best) | 0.078 | **0.078** (run 3,742; L∇B 5.1 → **9.1**, AR 10.5 → 11.8) | 0 |
+| Dataset's closest design | 0.203 | 0.126 (L∇B 8.5, AR 12.2) | 0 |
+| Paper's own start (near-axis shape) | 0.98 (very low fidelity) | 0.72 (very low fidelity) | 0 |
+
+![Test 7](alm_warmstart.png)
+
+- **No feasible design from any start.** ALM-NGOpt didn't close the gap at this budget.
+- **From our design it made no progress toward feasible**, but found a design just as
+  close (0.0776 vs. 0.0778) with a much better objective: L∇B 9.1 instead of 5.1, at
+  aspect ratio 11.8. That's a better trade-off for the final score once we're feasible.
+- **Its own chosen point drifted away each iteration** (ours: 0.20 → 0.42 → 0.29; dataset:
+  0.57 → 0.69 → 0.26). Early on, ALM weights the objective (L∇B) heavily and the
+  requirements lightly, and searches a wide box, so it trades feasibility for L∇B and
+  pushes aspect ratio up to its limit. It only tightens up over many more iterations.
+- **Matched-budget comparison (the project's main question):** with ~5,000 cheap runs,
+  ALM-NGOpt from its usual start gets to 0.72; from the dataset's best, 0.126. Our loop
+  (Tests 5–6, ~4,000 cheap runs) got to 0.078. Caveat: our loop started from 20 seeds,
+  the ALM runs from one.
+- **Very slow shapes:** from the dataset start, 645 runs took over a minute each (up to
+  3 min), so that arm took 2.2 h instead of ~35 min.
+
 ## What this means for the plan
 
 1. **Surrogate:** a neural net is viable for QI *on known shapes*. Boosted trees are a
@@ -315,3 +354,8 @@ unchecked candidates per design every 10 rounds). Two changes from Test 5:
    or bigger, smarter moves than a local trust region allows.
 10. **Near the finish, very low fidelity is too noisy to steer by.** Switch the final
     stage to low or high fidelity.
+11. **ALM-NGOpt as-is isn't a cheap finisher (Test 7).** At a laptop-sized budget it
+    doesn't get closer to feasible than our loop, from any start. That's good news for the
+    baseline comparison. To actually reach feasible, try: ALM with a small search box
+    (e.g. ±0.05 instead of ±0.33) and higher starting penalties, so it polishes instead of
+    exploring; or many more ALM iterations (the paper's full budget is ~100× ours).

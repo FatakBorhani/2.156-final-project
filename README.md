@@ -155,7 +155,7 @@ means we can't rerun the full baseline on a laptop.
 
 ---
 
-## What the feasibility tests showed (Nov 14–16)
+## What the feasibility tests showed (Nov 14–15)
 
 Quick, throwaway checks of the plan's riskiest assumptions, on the 68k designs with 3
 field periods. Full write-up, numbers and figures:
@@ -169,6 +169,7 @@ field periods. Full write-up, numbers and figures:
 | 2, 2b | Does searching on the surrogate, then checking once, find better real designs? | **No.** Most searched shapes break in VMEC++ and none were feasible. The search lands on unfamiliar shapes where the surrogate is confidently wrong (mirror ratio predicted ~0.05, actually 1.4–2.4) |
 | 5 | Does a small physics-in-the-loop search work? | **Yes.** In 1,600 cheap VMEC++ runs per method, it found designs about **twice as close to feasible** as anything in the dataset (worst violation 0.203 → **0.096**). VAE steps did best; surrogate + PCA steps were no better than random steps. Nothing feasible yet |
 | 6 | Can a longer, focused push reach feasible? | **No.** Best 0.096 → **0.078**, then stuck: no small step improves any of the 5 best designs, which each still fail 3–5 requirements by ~0.08–0.15. Reaching feasible needs a stronger constrained optimizer or new starting points |
+| 7 | Does the paper's optimizer (ALM-NGOpt) finish the job from our best design? | **No, not at a budget we can afford.** 5,400 cheap runs from each of 3 starts, nothing feasible. From the same budget: its usual start reached 0.72, the dataset's best 0.126, our design stayed at 0.078 (but found a version with L∇B 9.1 instead of 5.1). **At a matched budget, our loop beats the baseline** |
 
 **Test 5 in one picture:** median distance to feasible over 20 seed designs, for three
 search methods with the same VMEC++ budget. Lower is better.
@@ -188,9 +189,11 @@ search methods with the same VMEC++ budget. Lower is better.
 - **Always compare against random steps.** In Test 5 the surrogate with PCA steps didn't
   beat plain trial and error. The VAE did, though partly because its steps were bigger.
   That comparison is our honest "does ML help" test.
-- **Local polishing stalls around 0.08 (Test 6).** Next: warm-start the paper's own
-  optimizer (ALM-NGOpt) from our best designs and count how many runs it needs to reach
-  feasible, compared with its usual start.
+- **Local polishing stalls around 0.08 (Test 6), and the paper's optimizer doesn't break
+  through either (Test 7).** With ~5,000 cheap runs, ALM-NGOpt gets to 0.72 from its usual
+  start and 0.126 from the dataset's best, versus 0.078 for our loop: a good sign for the
+  baseline comparison. Reaching feasible still needs something new: ALM tuned to polish
+  (small search box, high penalties), more diverse starts, or a bigger budget.
 
 ---
 
@@ -289,7 +292,7 @@ Run from the repo root with the `stellarator` env active. Each script's docstrin
 | `scripts/count_feasible.py` | Pass rate of each requirement across the dataset | ~1 min |
 | `scripts/check_feasibility.py` | Feasibility counts with the benchmark's own function, all 3 benchmarks | ~2 min |
 | `scripts/time_eval.py` | Times one official evaluation | ~2 min |
-| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop) | 5–60 min each |
+| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop, ALM warm start) | 5 min–3 h each |
 
 The first data script downloads the dataset (~600 MB) into the Hugging Face cache.
 

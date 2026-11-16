@@ -10,7 +10,11 @@ Each round:
      and pick the top `batch`, skipping any within 0.003 of an earlier pick.
      no --screen: pick `batch` at random (the no-ML arm).
   4. simulate the batch at full accuracy (run_sims.py: evaluate.py's simulator with a
-     450 s limit per design), log the round.
+     450 s limit per design), log the round to data/seeded/logs/loop_<name>.jsonl.
+
+Re-running the same command resumes: logged rounds are skipped, and a round that was
+interrupted mid-simulation finishes its existing picks (data/seeded/loop_<name>_r<k>.jsonl)
+rather than picking again.
 
 "Current front" = public front + this arm's novel passing designs so far. Each arm sees
 the shared starting data plus only its own simulations (arm_view). Every simulation
@@ -19,7 +23,7 @@ they share train.npz, and two 8-worker runs don't fit in RAM.
 
     python scripts/seeded/loop.py --name blend_screen --proposer blend --screen --rounds 4 --batch 120
     python scripts/seeded/loop.py --name blend_random --proposer blend --rounds 4 --batch 120
-    python scripts/seeded/loop.py ... --dry-run      # propose + select only, no simulation
+    python scripts/seeded/loop.py ... --dry-run      # pick the next round only -> logs/dryrun_*
 """
 
 from __future__ import annotations
@@ -42,6 +46,7 @@ from screen import TOL, Screen, load_table  # noqa: E402
 from shapes import aspect_ratio, to_vector  # noqa: E402
 
 DATA = Path(__file__).resolve().parents[2] / "data" / "seeded"
+LOGS = DATA / "logs"       # round summaries; not in runs/ (read as ledgers) or DATA (read as picks)
 REF_A, REF_L = 20.0, -1.0
 
 
@@ -94,51 +99,70 @@ def propose(proposer: str, n: int, seed: int, ours: dict) -> list[dict]:
     raise ValueError(proposer)
 
 
+def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: int, r: int,
+         pub: dict) -> list[dict]:
+    """One round's batch: propose, keep novel candidates, then screen or pick at random."""
+    training_data.build()
+    t = arm_view(load_table(), name); st = ours_status(t)
+    mine = st["novel_pass"]
+    fA = np.r_[pub["A"], t["A"][mine]]; fL = np.r_[pub["L"], t["L"][mine]]
+    ours = {k: t[k][mine] for k in ("X", "A", "L", "id")}
+
+    cands = [d for d in propose(proposer, pool, seed * 1000 + r, ours) if d["id"] not in st["ids"]]
+    V = np.array([to_vector(d["boundary"]) for d in cands])
+    A, nov = aspect_ratio(V), nearest_public(V)
+    done = t["X"][t["source"] == "ours"]          # don't re-simulate near-copies of our own
+    near = NearestNeighbors(n_neighbors=1).fit(done).kneighbors(V)[0][:, 0] if len(done) else np.inf
+    keep = (nov >= NOVELTY) & (near >= NOVELTY) & (A < 19.9)
+    cands, V, A = [c for c, k in zip(cands, keep) if k], V[keep], A[keep]
+    rng = np.random.default_rng(seed * 1000 + r)
+    if screen:
+        p = Screen().fit(t).predict(V)
+        score = (1 - p["p_crash"]) * p["p_pass"] * (hv_gain(A, p["L_gradB"], fA, fL) + 0.1)
+        order = np.argsort(-score)
+    else:
+        order = rng.permutation(len(cands))
+    chosen = []
+    for i in order:
+        if len(chosen) == batch:
+            break
+        if all(np.linalg.norm(V[i] - V[j]) >= NOVELTY for j in chosen):
+            chosen.append(i)
+    picks = [dict(cands[i], A_geom=float(A[i]), arm=name, round=r) for i in chosen]
+    if screen:
+        for i, d in zip(chosen, picks):
+            d.update(pred_pass=float(p["p_pass"][i]), pred_L=float(p["L_gradB"][i]),
+                     pred_crash=float(p["p_crash"][i]))
+    print(f"[{name} round {r}] {len(cands)} novel candidates -> {len(picks)} picked", flush=True)
+    return picks
+
+
+def write_jsonl(path: Path, rows: list[dict]) -> None:
+    with path.open("w") as fh:
+        for d in rows:
+            fh.write(json.dumps(d) + "\n")
+
+
 def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: int,
         seed: int, workers: int, dry_run: bool) -> None:
     import run_sims
     pub = load_public()
-    log = DATA / "runs" / f"loop_{name}_log.jsonl"
+    LOGS.mkdir(parents=True, exist_ok=True)
+    log = LOGS / f"loop_{name}.jsonl"
+    logged = {json.loads(x)["round"] for x in log.open()} if log.exists() else set()
     for r in range(rounds):
-        training_data.build()
-        t = arm_view(load_table(), name); st = ours_status(t)
-        mine = st["novel_pass"]
-        fA = np.r_[pub["A"], t["A"][mine]]; fL = np.r_[pub["L"], t["L"][mine]]
-        ours = {k: t[k][mine] for k in ("X", "A", "L", "id")}
-
-        cands = [d for d in propose(proposer, pool, seed * 1000 + r, ours) if d["id"] not in st["ids"]]
-        V = np.array([to_vector(d["boundary"]) for d in cands])
-        A, nov = aspect_ratio(V), nearest_public(V)
-        done = t["X"][t["source"] == "ours"]          # don't re-simulate near-copies of our own
-        near = NearestNeighbors(n_neighbors=1).fit(done).kneighbors(V)[0][:, 0] if len(done) else np.inf
-        keep = (nov >= NOVELTY) & (near >= NOVELTY) & (A < 19.9)
-        cands, V, A = [c for c, k in zip(cands, keep) if k], V[keep], A[keep]
-        rng = np.random.default_rng(seed * 1000 + r)
-        if screen:
-            p = Screen().fit(t).predict(V)
-            score = (1 - p["p_crash"]) * p["p_pass"] * (hv_gain(A, p["L_gradB"], fA, fL) + 0.1)
-            order = np.argsort(-score)
-        else:
-            order = rng.permutation(len(cands))
-        chosen = []
-        for i in order:
-            if len(chosen) == batch:
-                break
-            if all(np.linalg.norm(V[i] - V[j]) >= NOVELTY for j in chosen):
-                chosen.append(i)
-        picks = [dict(cands[i], A_geom=float(A[i]), arm=name, round=r) for i in chosen]
-        if screen:
-            for i, d in zip(chosen, picks):
-                d.update(pred_pass=float(p["p_pass"][i]), pred_L=float(p["L_gradB"][i]),
-                         pred_crash=float(p["p_crash"][i]))
+        if r in logged:
+            continue
         infile = DATA / f"loop_{name}_r{r}.jsonl"
-        with infile.open("w") as fh:
-            for d in picks:
-                fh.write(json.dumps(d) + "\n")
-        print(f"[{name} round {r}] {len(cands)} novel candidates -> {len(picks)} picked -> {infile.name}",
-              flush=True)
-        if dry_run:
+        if dry_run:                               # kept out of DATA so arm_view never sees it
+            write_jsonl(LOGS / f"dryrun_{name}_r{r}.jsonl", pick(name, proposer, screen, batch, pool, seed, r, pub))
             return
+        if infile.exists():                       # interrupted mid-round: finish the same picks
+            picks = [json.loads(x) for x in infile.open()]
+            print(f"[{name} round {r}] resuming {len(picks)} picks from {infile.name}", flush=True)
+        else:
+            picks = pick(name, proposer, screen, batch, pool, seed, r, pub)
+            write_jsonl(infile, picks)
         rows = run_sims.run(picks, DATA / "runs" / f"loop_{name}.jsonl", workers=workers)
         npass = sum(x["feasible"] for x in rows if x["id"] in {d["id"] for d in picks})
         training_data.build()

@@ -6,7 +6,8 @@ in standard form (shapes.py):
   public   leaderboard designs: L_gradB and the max violation only (no per-constraint
            values), all passing. The only labels near the front.
   ours     every high-fidelity result in data/seeded/runs/*.jsonl: full labels,
-           including crashes and failures near the front.
+           including crashes and failures near the front. Timeouts are left out (they
+           reflect machine load, not the shape); a later file's row for the same id wins.
 
 The dataset part downloads ~0.6 GB into the Hugging Face cache on first use and is
 cached in data/seeded/dataset_nfp3.npz; `ours` is re-read every time.
@@ -90,8 +91,10 @@ def ours_part() -> dict:
                     boundaries[d["id"]] = b
     rows = []
     for f in sorted((DATA / "runs").glob("*.jsonl")):
+        # a timeout says the machine was busy (e.g. Game Mode), not that the shape crashes
         rows += [r for r in map(json.loads, f.open())
-                 if r["fidelity"] == "high_fidelity" and r["id"] in boundaries]
+                 if r["fidelity"] == "high_fidelity" and r["id"] in boundaries
+                 and not r.get("timeout")]
     rows = list({r["id"]: r for r in rows}.values())
     X = np.array([to_vector(boundaries[r["id"]]) for r in rows]).reshape(-1, N_FREE)
     return {

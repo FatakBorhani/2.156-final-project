@@ -16,10 +16,10 @@ Re-running the same command resumes: logged rounds are skipped, and a round that
 interrupted mid-simulation finishes its existing picks (data/seeded/loop_<name>_r<k>.jsonl)
 rather than picking again.
 
-"Current front" = public front + this arm's novel passing designs so far. Each arm sees
-the shared starting data plus only its own simulations (arm_view). Every simulation
-counts toward the budget, crashes included. Run arms one after another, not at once:
-they share train.npz, and two 8-worker runs don't fit in RAM.
+"Current front" = the public NFP-3 4x4 front + this arm's novel passing designs so far.
+Each arm sees the shared starting data plus only its own simulations (arm_view). Every
+simulation counts toward the budget, crashes included. Run arms one after another, not at
+once: they share train.npz, and two 8-worker runs don't fit in RAM.
 
     python scripts/seeded/loop.py --name blend_screen --proposer blend --screen --rounds 4 --batch 120
     python scripts/seeded/loop.py --name blend_random --proposer blend --rounds 4 --batch 120

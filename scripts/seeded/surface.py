@@ -13,7 +13,8 @@ stay on it, all built from public front designs in standard form (shapes.py):
            (compact end, and the flat gap A 14-18.5)
 
 In the first surface batch, blends were the only method that produced novel passing
-designs, some beyond the public front. `blend` is the blend-only proposer loop.py uses.
+designs, some beyond the public NFP-3 4x4 front (the leaderboard's best front is
+higher resolution). `blend` is the blend-only proposer loop.py uses.
 
     python scripts/seeded/surface.py data/seeded/surface.jsonl --n 960 --seed 1
 """

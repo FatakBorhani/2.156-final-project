@@ -1,0 +1,2 @@
+# Keep notebooks out of GitHub's language bar: embedded figures would make them dominate it
+*.ipynb linguist-detectable=false

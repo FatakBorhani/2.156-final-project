@@ -155,7 +155,7 @@ means we can't rerun the full baseline on a laptop.
 
 ---
 
-## What the feasibility tests showed (Nov 14–16)
+## What the feasibility tests showed (Nov 14–17)
 
 Quick, throwaway checks of the plan's riskiest assumptions, on the 68k designs with 3
 field periods. Full write-up, numbers and figures:
@@ -172,6 +172,7 @@ field periods. Full write-up, numbers and figures:
 | 7 | Does the paper's optimizer (ALM-NGOpt) finish the job from our best design? | **No, not at a budget we can afford.** 5,400 cheap runs from each of 3 starts, nothing feasible. From the same budget: its usual start reached 0.72, the dataset's best 0.126, our design stayed at 0.078 (but found a version with L∇B 9.1 instead of 5.1). **At a matched budget, our loop beats the baseline** |
 | 8 | Does that optimizer do better if retuned to polish instead of explore? | **Much better, not feasible yet.** With penalties scaled like the benchmark, a shrinking search box and L∇B only as a tie-breaker, 6,000 cheap runs per design halved the best gap: **0.078 → 0.033** at high fidelity. Only QI and mirror ratio are still ~0.03 short. Still improving when it stopped |
 | 9 | Can correcting the cheap search with a few high-fidelity checks per round cross the line? | **Yes: first feasible design.** Worst violation **0.0087** at high fidelity (passes at ≤ 0.01), L∇B 8.59, aspect ratio 12.05, confirmed by a fresh evaluation. Starting only from the dataset, roughly 27 CPU-hours of simulation along the way vs. 1,400–2,300 per run of the paper's baseline. 1 of 3 starts got there |
+| 10 | Can we spread out from the feasible design to build our own front? | **Many feasible designs, one point on the front.** 50 feasible designs (the safest passes by a wide margin, 0.0005), but all at aspect ratio 12.0–12.3 with L∇B 8.49–8.59: hypervolume **76.5** (paper's baseline submission 129.8; public designs in this design space 205.5). More compact runs got close (0.016 at aspect ratio 11.5) but not feasible |
 
 **Test 5 in one picture:** median distance to feasible over 20 seed designs, for three
 search methods with the same VMEC++ budget. Lower is better.
@@ -202,6 +203,10 @@ search methods with the same VMEC++ budget. Lower is better.
 - **Correcting the cheap search with high-fidelity checks got us over the line (Test 9).**
   Next: spread out from the feasible design to build a front (compare with the seeded
   track), and let the surrogate screen candidates to cut the cost per feasible design.
+- **One feasible design gives many safe copies, but not a front (Test 10).** To cover the
+  trade-off between compactness and coil simplicity, we need different starting points:
+  smaller aspect-ratio steps chained from the last feasible design, more seeds, or the
+  public feasible designs (the seeded track).
 
 ---
 

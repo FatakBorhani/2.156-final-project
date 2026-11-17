@@ -16,6 +16,7 @@ valid designs with 3 field periods.*
 | 7 | Does the paper's optimizer (ALM-NGOpt) finish the job if started from our best design? | ✅ done | **No, not at a budget we can afford.** 5,400 runs from each of 3 starts: nothing feasible. From our design it found an equally close design with much higher L∇B; from the dataset's best it reached 0.126; from the paper's start 0.72 |
 | 8 | Does ALM-NGOpt, retuned to polish, get closer? | ✅ done | **Much closer, not yet feasible.** Best 0.078 → **0.033** at high fidelity (QI and mirror ratio each ~0.03 short). Still improving when the budget ran out |
 | 9 | Does correcting the cheap search with high-fidelity checks reach feasible? | ✅ done | **Yes: first feasible design, 0.0087** at high fidelity (L∇B 8.59, aspect ratio 12.05), confirmed by a fresh evaluation. The other two starts reached 0.018 and 0.032 |
+| 10 | Can we spread out from the feasible design to build our own front? | ✅ done | **Many designs, one point.** 50 feasible designs (49 new), the safest at 0.0005, but all at aspect ratio 12.0–12.3 and L∇B 8.49–8.59: hypervolume **76.5**. More compact runs (AR ≤ 11, ≤ 10) and a second seed didn't reach feasible |
 
 **Bottom line:** the pieces work (surrogate on known shapes, VAE latent space, cheap
 VMEC++ filter), but "optimize the surrogate, then check once" does not. The search walks
@@ -31,6 +32,10 @@ instead of explore and more than halved the gap: **0.078 → 0.033**. Test 9 cor
 cheap search with a few high-fidelity checks per round and **reached the first feasible
 design (0.0087)**, starting only from Proxima's dataset, in roughly 27 CPU-hours of
 simulation along the way (vs. 1,400–2,300 CPU-hours per run of the paper's baseline).
+Test 10 spread out from that design: feasible neighbours are easy to find (50, about half of
+all high-fidelity checks), but they don't trade off: L∇B didn't rise and the aspect ratio
+didn't fall, so our front is one cluster (hypervolume 76.5, vs. 129.8 for the paper's
+baseline submission and 205.5 for the public designs in the same design space).
 Details below.
 
 ## Test 1: surrogate accuracy
@@ -424,6 +429,48 @@ restarted; it resumed from its best design, 0.0247, shown as `t7_ours_r1`.)
   The claim is reaching feasibility from Proxima's dataset alone, on a laptop budget.
 - On battery the Mac throttled rounds from ~5 to ~14 min: run long tests plugged in.
 
+## Test 10: building a front from the feasible design
+
+`scripts/feasibility_tests/front_test.py` → `front.json`, `front.png`, `front_feasible_designs.jsonl`
+
+Test 9's method, restarted from the feasible design with the goal changed: L∇B is now a
+real objective (weight 1.0 instead of a 0.05 tie-breaker), and the run **keeps going after
+feasible designs** instead of stopping. Every high-fidelity check that passes Benchmark 3
+counts as a feasible design for our front. Four runs of 15 iterations each, at different
+aspect-ratio limits (12, 14, 11, 10). Then a second attempt at a different design: Test
+9's seed 2 resumed from its best (0.018) with the box reset, 30 iterations, stopping at
+the first feasible design. 27,000 very-low + 275 high-fidelity runs, 5.7 h of wall time.
+
+| Run | Aspect-ratio limit | Best, high fidelity | Feasible designs | L∇B (feasible) | AR (feasible) |
+|---|---|---|---|---|---|
+| ar12 | 12 | 0.0059 | 22 | 8.50–8.57 | 12.02–12.09 |
+| ar14 | 14 | **0.0005** | 27 | 8.49–8.59 | 12.07–12.33 |
+| ar11 | 11 | 0.016 at AR 11.5 (closest: AR 11.2) | 0 | – | – |
+| ar10 | 10 | 0.052 at AR 10.4 | 0 | – | – |
+| seed2_resume | 12 | 0.0148 (from 0.018) | 0 | – | – |
+
+![Test 10](front.png)
+
+- **Feasible neighbours are easy to find.** About half of all high-fidelity checks in the
+  AR 12 and AR 14 runs passed. 11 of the 50 have a margin under 0.005, and the safest
+  (0.0005, L∇B 8.51, AR 12.33) passes four requirements outright, and its mirror ratio
+  is only 0.05% over the limit, well inside the 1% tolerance.
+- **But they don't trade off.** L∇B never rose above Test 9's 8.59, even with the aspect
+  ratio allowed up to 14, and the aspect ratio never fell below 12.02. Near this design the
+  five requirements, not the aspect ratio, are what limit L∇B: pushing it up breaks QI or
+  mirror ratio first. The front is 5 designs within 0.07 in aspect ratio of each other:
+  **hypervolume 76.5** (benchmark reference point: AR 20, L∇B −1).
+- **More compact is close but not there.** The AR ≤ 11 run reached 0.016 at AR 11.5 and
+  checked designs down to AR 11.2. AR ≤ 10 got to 0.052 at AR 10.4. Both were still
+  improving after 15 iterations.
+- **The second seed stays stuck** at ~0.015 (QI and mirror ratio short), so we still have
+  one family of feasible designs.
+- **Context:** the paper's baseline submission scores 129.8 on the leaderboard, and the
+  ~8,300 public feasible designs in this design space (3 field periods, 4×4 modes) 205.5.
+  A front needs **spread** (different aspect ratios), which a local method started from one
+  design doesn't provide. That's the case for the seeded track (start from many public
+  designs) and for the comparison between the two tracks.
+
 ## What this means for the plan
 
 1. **Surrogate:** a neural net is viable for QI *on known shapes*. Boosted trees are a
@@ -469,3 +516,9 @@ restarted; it resumed from its best design, 0.0247, shown as `t7_ours_r1`.)
     limits) to build our own front for comparison with the seeded track; let a surrogate
     trained on our ~100k near-boundary runs screen candidates to cut runs per feasible
     design; and repeat from more seeds for error bars.
+14. **A front needs spread, not more polishing (Test 10).** Local search around one
+    feasible design gives many safe copies but no trade-off. To cover the front: chain
+    compact runs in smaller aspect-ratio steps (12 → 11.5 → 11 …, each from the last
+    feasible design) with more iterations; start from several different near-feasible
+    designs; or start from public feasible designs (the seeded track) and compare cost per
+    feasible design.

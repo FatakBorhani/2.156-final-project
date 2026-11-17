@@ -1,0 +1,89 @@
+{
+  "hypervolume": 76.53078044528198,
+  "n_feasible": 50,
+  "n_front": 5,
+  "runs": {
+    "ar12": {
+      "iterations": 15,
+      "very_low_runs": 4500,
+      "high_runs": 46,
+      "best_worst_hi": 0.005898706524407826,
+      "n_feasible": 22,
+      "best_feasible_L_gradB": 8.572636743917077,
+      "min_feasible_aspect_ratio": 12.019663507926161,
+      "hours": 0.83
+    },
+    "ar14": {
+      "iterations": 15,
+      "very_low_runs": 4500,
+      "high_runs": 46,
+      "best_worst_hi": 0.0005092083259068403,
+      "n_feasible": 27,
+      "best_feasible_L_gradB": 8.59000136524005,
+      "min_feasible_aspect_ratio": 12.067261274466977,
+      "hours": 0.92
+    },
+    "ar11": {
+      "iterations": 15,
+      "very_low_runs": 4500,
+      "high_runs": 46,
+      "best_worst_hi": 0.00866647236834098,
+      "n_feasible": 0,
+      "best_feasible_L_gradB": null,
+      "min_feasible_aspect_ratio": null,
+      "hours": 0.82
+    },
+    "ar10": {
+      "iterations": 15,
+      "very_low_runs": 4500,
+      "high_runs": 46,
+      "best_worst_hi": 0.00866647236834098,
+      "n_feasible": 0,
+      "best_feasible_L_gradB": null,
+      "min_feasible_aspect_ratio": null,
+      "hours": 0.72
+    },
+    "seed2_resume": {
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 91,
+      "best_worst_hi": 0.014783780912146558,
+      "n_feasible": 0,
+      "best_feasible_L_gradB": null,
+      "min_feasible_aspect_ratio": null,
+      "hours": 2.37
+    }
+  },
+  "front": [
+    {
+      "run": "ar12",
+      "aspect_ratio": 12.019663507926161,
+      "L_gradB": 8.556004002740444,
+      "worst": 0.00872042731930137
+    },
+    {
+      "run": "ar12",
+      "aspect_ratio": 12.021645329349967,
+      "L_gradB": 8.570587483348413,
+      "worst": 0.009494103956193609
+    },
+    {
+      "run": "ar12",
+      "aspect_ratio": 12.030892868555217,
+      "L_gradB": 8.572636743917077,
+      "worst": 0.008998512724523853
+    },
+    {
+      "run": "test9",
+      "aspect_ratio": 12.054124801905951,
+      "L_gradB": 8.589795368795095,
+      "worst": 0.00866647236834098
+    },
+    {
+      "run": "ar14",
+      "aspect_ratio": 12.088531806491853,
+      "L_gradB": 8.59000136524005,
+      "worst": 0.008991799535907452
+    }
+  ]
+}

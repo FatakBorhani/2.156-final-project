@@ -46,6 +46,7 @@ W_OBJ = 0.05
 P0 = 100.0
 B0, B_MIN, SHRINK = 0.02, 0.003, 0.7
 INNER, MAXIT, TOP_HI = 300, 30, 3
+STOP_ON_FEASIBLE = True  # Test 10 sets False to keep improving L_gradB while feasible
 
 OUT = ROOT / "results" / "feasibility_tests"
 DATA = ROOT / "data" / "feasibility_tests"
@@ -136,7 +137,7 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
             objective=jnp.array(obj), constraints=jnp.array(cons), bounds=jnp.full(len(x), B0))
         bounds, rng = B0, np.random.RandomState(123)
         print(f"[{name}] start: high {cur_hi['worst']:.4f}, very low {cur_vlo['worst']:.4f}", flush=True)
-        if cur_hi["feasible"]:
+        if cur_hi["feasible"] and STOP_ON_FEASIBLE:
             print(f"[{name}] start is already feasible", flush=True)
             return
 
@@ -180,7 +181,9 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
                       for (xx, v), h in zip(picks, his) if h["ok"]]
             feasible = [s for s in scored if s[3]["feasible"]]
             best = min(feasible or scored, key=lambda s: s[0], default=None)
-            moved = best is not None and (best[0] < cur_val or best[3]["feasible"])
+            # never trade a feasible current design for a worse-scoring one
+            moved = best is not None and (best[0] < cur_val
+                                          or (best[3]["feasible"] and not cur_hi["feasible"]))
             if moved:
                 _, x, v, cur_hi = best
                 offset = raw_vec(cur_hi) - raw_vec(v)
@@ -200,8 +203,10 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
                   f"{cur_hi['worst']:.4f} (L_gradB {cur_hi['L_gradB']:.2f}), box {bounds:.4f}, "
                   f"{(time.time() - t_start) / 60:.0f} min", flush=True)
             if feasible:
-                print(f"[{name}] FEASIBLE at high fidelity in iteration {k}", flush=True)
-                return
+                print(f"[{name}] FEASIBLE at high fidelity in iteration {k} "
+                      f"({len(feasible)} of {len(his)} checked)", flush=True)
+                if STOP_ON_FEASIBLE:
+                    return
 
 
 def read(p: Path) -> list[dict]:

@@ -47,6 +47,7 @@ P0 = 100.0
 B0, B_MIN, SHRINK = 0.02, 0.003, 0.7
 INNER, MAXIT, TOP_HI = 300, 30, 3
 STOP_ON_FEASIBLE = True  # Test 10 sets False to keep improving L_gradB while feasible
+AR_FEAS_TOL = None  # Test 11 sets a number: 'feasible' then also needs AR <= AR_BOUND + tol
 
 OUT = ROOT / "results" / "feasibility_tests"
 DATA = ROOT / "data" / "feasibility_tests"
@@ -70,6 +71,12 @@ def cons_obj(row: dict, offset: np.ndarray) -> tuple[float, list[float]]:
     raw = np.array([row["aspect_ratio"], *row["violations"]]) + offset
     return (W_OBJ * (20.0 - row["L_gradB"]) / 20.0,
             [(raw[0] - AR_BOUND) / AR_BOUND, *(raw[1:] + MARGIN).tolist()])
+
+
+def is_feasible(row: dict) -> bool:
+    """Benchmark 3 feasible, and (if AR_FEAS_TOL is set) within this run's aspect-ratio limit."""
+    return bool(row.get("feasible")) and (AR_FEAS_TOL is None
+                                         or row["aspect_ratio"] <= AR_BOUND + AR_FEAS_TOL)
 
 
 def raw_vec(row: dict) -> np.ndarray:
@@ -137,7 +144,7 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
             objective=jnp.array(obj), constraints=jnp.array(cons), bounds=jnp.full(len(x), B0))
         bounds, rng = B0, np.random.RandomState(123)
         print(f"[{name}] start: high {cur_hi['worst']:.4f}, very low {cur_vlo['worst']:.4f}", flush=True)
-        if cur_hi["feasible"] and STOP_ON_FEASIBLE:
+        if is_feasible(cur_hi) and STOP_ON_FEASIBLE:
             print(f"[{name}] start is already feasible", flush=True)
             return
 
@@ -179,11 +186,11 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
             cur_val = lag(*cons_obj(cur_hi, np.zeros(6)))
             scored = [(lag(*cons_obj(h, np.zeros(6))), xx, v, h)
                       for (xx, v), h in zip(picks, his) if h["ok"]]
-            feasible = [s for s in scored if s[3]["feasible"]]
+            feasible = [s for s in scored if is_feasible(s[3])]
             best = min(feasible or scored, key=lambda s: s[0], default=None)
             # never trade a feasible current design for a worse-scoring one
             moved = best is not None and (best[0] < cur_val
-                                          or (best[3]["feasible"] and not cur_hi["feasible"]))
+                                          or (is_feasible(best[3]) and not is_feasible(cur_hi)))
             if moved:
                 _, x, v, cur_hi = best
                 offset = raw_vec(cur_hi) - raw_vec(v)

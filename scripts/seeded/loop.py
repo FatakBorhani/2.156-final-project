@@ -1,8 +1,9 @@
 """The pipeline: propose -> screen -> simulate, in rounds.
 
 Each round:
-  1. propose a large pool of candidates (perturb.py, surface.py, or surface.blend, which
-     also blends our own new passing designs; later a VAE)
+  1. propose a large pool of candidates (perturb.py, surface.py, surface.blend, which
+     also blends our own new passing designs, or gen:<name>, a trained generative model
+     from generators.FINALISTS aimed at the current front)
   2. keep novel ones (>= 0.003 from every public design and everything we've simulated)
      with exact aspect ratio < 19.9
   3. --screen: retrain the screening models on everything simulated so far, then rank by
@@ -23,6 +24,7 @@ once: they share train.npz, and two 8-worker runs don't fit in RAM.
 
     python scripts/seeded/loop.py --name blend_screen --proposer blend --screen --rounds 4 --batch 120
     python scripts/seeded/loop.py --name blend_random --proposer blend --rounds 4 --batch 120
+    python scripts/seeded/loop.py --name g60_diff --proposer gen:diff_w256_s3k --screen --batch 60
     python scripts/seeded/loop.py ... --dry-run      # pick the next round only -> logs/dryrun_*
 """
 
@@ -97,6 +99,9 @@ def propose(proposer: str, n: int, seed: int, ours: dict, layers: int = 1,
         return surface.propose(n, seed)
     if proposer == "blend":
         return surface.blend(n, seed, ours, layers=layers, window=window)
+    if proposer.startswith("gen:"):
+        import generators                   # JAX; trained once per process, then cached
+        return generators.propose(proposer[4:], n, seed, ours)
     raise ValueError(proposer)
 
 
@@ -184,7 +189,8 @@ def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: i
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--name", required=True)
-    ap.add_argument("--proposer", choices=["random", "surface", "blend"], default="blend")
+    ap.add_argument("--proposer", default="blend",
+                    help="random, surface, blend, or gen:<name> (a generators.FINALISTS entry)")
     ap.add_argument("--screen", action="store_true")
     ap.add_argument("--rounds", type=int, default=4)
     ap.add_argument("--batch", type=int, default=120)
@@ -197,6 +203,12 @@ def main() -> None:
     ap.add_argument("--window", type=float, default=1.0,
                     help="blend: largest aspect-ratio gap between the two parents")
     a = ap.parse_args()
+    if a.proposer.startswith("gen:"):
+        import generators
+        if a.proposer[4:] not in generators.FINALISTS:
+            ap.error(f"unknown generator {a.proposer[4:]}; choose from {', '.join(generators.FINALISTS)}")
+    elif a.proposer not in ("random", "surface", "blend"):
+        ap.error(f"unknown proposer {a.proposer}")
     run(a.name, a.proposer, a.screen, a.rounds, a.batch, a.pool, a.seed, a.workers, a.dry_run,
         a.layers, a.window)
 

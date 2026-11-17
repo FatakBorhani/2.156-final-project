@@ -15,6 +15,7 @@ valid designs with 3 field periods.*
 | 6 | Can a longer, focused push reach a feasible design? | ✅ done | **No.** Best 0.096 → **0.078**, then stalled. The designs sit at a local optimum where 3–5 requirements fail together |
 | 7 | Does the paper's optimizer (ALM-NGOpt) finish the job if started from our best design? | ✅ done | **No, not at a budget we can afford.** 5,400 runs from each of 3 starts: nothing feasible. From our design it found an equally close design with much higher L∇B; from the dataset's best it reached 0.126; from the paper's start 0.72 |
 | 8 | Does ALM-NGOpt, retuned to polish, get closer? | ✅ done | **Much closer, not yet feasible.** Best 0.078 → **0.033** at high fidelity (QI and mirror ratio each ~0.03 short). Still improving when the budget ran out |
+| 9 | Does correcting the cheap search with high-fidelity checks reach feasible? | ✅ done | **Yes: first feasible design, 0.0087** at high fidelity (L∇B 8.59, aspect ratio 12.05), confirmed by a fresh evaluation. The other two starts reached 0.018 and 0.032 |
 
 **Bottom line:** the pieces work (surrogate on known shapes, VAE latent space, cheap
 VMEC++ filter), but "optimize the surrogate, then check once" does not. The search walks
@@ -26,7 +27,11 @@ constrained optimizer or different starting points, not more of the same. Test 7
 the paper's constrained optimizer from our best design: in 5,400 runs it didn't get closer
 to feasible, so at a matched, laptop-sized budget our loop (0.078) beats it (0.126 from
 the dataset's best, 0.72 from its own start). Test 8 retuned that optimizer to polish
-instead of explore and more than halved the gap: **0.078 → 0.033**. Details below.
+instead of explore and more than halved the gap: **0.078 → 0.033**. Test 9 corrected the
+cheap search with a few high-fidelity checks per round and **reached the first feasible
+design (0.0087)**, starting only from Proxima's dataset, in roughly 27 CPU-hours of
+simulation along the way (vs. 1,400–2,300 CPU-hours per run of the paper's baseline).
+Details below.
 
 ## Test 1: surrogate accuracy
 
@@ -375,6 +380,50 @@ closest designs per start were re-checked at high fidelity. 6.0 h overnight.
   feasible, but the final score needs it back.
 - Aspect ratios ended slightly over 12 (Benchmark 3 itself has no aspect-ratio limit).
 
+## Test 9: multi-fidelity finish — first feasible design
+
+`scripts/feasibility_tests/multifid_test.py` → `multifid.json`, `multifid.png`, `multifid_checked_designs.jsonl`, `first_feasible_design.jsonl`
+
+Near the line, very low fidelity is off by about as much as the remaining gap, so Test 8
+couldn't tell when it had crossed. Each outer iteration here:
+
+1. searches with 300 very-low-fidelity runs, each candidate scored by its very-low-fidelity
+   violations **plus the measured (high − very low) offset at the current design**;
+2. re-checks the 3 best candidates at high fidelity, in parallel;
+3. moves only if one is better at high fidelity, and re-measures the offset there;
+   otherwise shrinks the box.
+
+Same ALM machinery as Test 8 (normalized constraints, margin 0.005, L∇B as tie-breaker),
+box reset to ±0.02. Starts: Test 8's 3 best designs (different seeds). A start stops as
+soon as a high-fidelity check passes. 25,500 very-low + 256 high-fidelity runs, ~7 h of
+wall time. (The first start was interrupted after 9 iterations when the session
+restarted; it resumed from its best design, 0.0247, shown as `t7_ours_r1`.)
+
+| Start (high fidelity) | Best, high fidelity | Feasible | L∇B | AR | Iterations |
+|---|---|---|---|---|---|
+| Test 8 best (0.033) | **0.0087** | **yes, iteration 15 of the resumed run** | 8.59 | 12.05 | 9 + 15 |
+| Test 8 seed 2 (0.044) | 0.018 | no | 7.22 | 12.05 | 30 |
+| Test 8 seed 0 (0.046) | 0.032 | no (stalled from iteration 3) | 4.06 | 11.06 | 30 |
+
+![Test 9](multifid.png)
+
+- **First feasible Benchmark 3 design from the pipeline.** Re-evaluated from scratch with
+  `scripts/evaluate.py` at high fidelity: feasible, max violation 0.0087 (QI 0.0087,
+  mirror ratio 0.0083, iota 0.0016, vacuum well and flux compression pass), L∇B 8.59,
+  aspect ratio 12.05. Saved in `first_feasible_design.jsonl`.
+- **Margin is thin** (three requirements inside the 1% tolerance), as for most public
+  feasible designs, which sit between 0.005 and 0.01.
+- **Rough cost of the chain that produced it:** ~23,000 very-low + ~150 high-fidelity
+  runs, ≈ 27 CPU-hours (Test 5 VAE arm → Test 6 → Test 7 → Test 8 → Test 9; surrogate
+  training and the other arms not counted). The paper's baseline spends 1,400–2,300
+  CPU-hours per run.
+- **Not every start gets there.** Seed 2 more than halved its gap but stalled at 0.018 with
+  the box at its minimum; seed 0 stalled at 0.032 from iteration 3.
+- **Context:** the public leaderboard already has ~8,300 feasible designs in this design
+  space (3 field periods, 4×4 modes), so this is not the first feasible design anywhere.
+  The claim is reaching feasibility from Proxima's dataset alone, on a laptop budget.
+- On battery the Mac throttled rounds from ~5 to ~14 min: run long tests plugged in.
+
 ## What this means for the plan
 
 1. **Surrogate:** a neural net is viable for QI *on known shapes*. Boosted trees are a
@@ -415,3 +464,8 @@ closest designs per start were re-checked at high fidelity. 6.0 h overnight.
     best 2–3 designs with a reset box, and run the last stretch at high fidelity (or with
     a bigger margin), since very-low-fidelity error (~0.02) is now as big as the remaining
     gap. Then bring L∇B back up while staying feasible.
+13. **Multi-fidelity correction closes the last gap (Test 9).** Next: spread out from the
+    feasible design (keep feasible, push L∇B up / aspect ratio down at several aspect-ratio
+    limits) to build our own front for comparison with the seeded track; let a surrogate
+    trained on our ~100k near-boundary runs screen candidates to cut runs per feasible
+    design; and repeat from more seeds for error bars.

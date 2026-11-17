@@ -171,6 +171,7 @@ field periods. Full write-up, numbers and figures:
 | 6 | Can a longer, focused push reach feasible? | **No.** Best 0.096 → **0.078**, then stuck: no small step improves any of the 5 best designs, which each still fail 3–5 requirements by ~0.08–0.15. Reaching feasible needs a stronger constrained optimizer or new starting points |
 | 7 | Does the paper's optimizer (ALM-NGOpt) finish the job from our best design? | **No, not at a budget we can afford.** 5,400 cheap runs from each of 3 starts, nothing feasible. From the same budget: its usual start reached 0.72, the dataset's best 0.126, our design stayed at 0.078 (but found a version with L∇B 9.1 instead of 5.1). **At a matched budget, our loop beats the baseline** |
 | 8 | Does that optimizer do better if retuned to polish instead of explore? | **Much better, not feasible yet.** With penalties scaled like the benchmark, a shrinking search box and L∇B only as a tie-breaker, 6,000 cheap runs per design halved the best gap: **0.078 → 0.033** at high fidelity. Only QI and mirror ratio are still ~0.03 short. Still improving when it stopped |
+| 9 | Can correcting the cheap search with a few high-fidelity checks per round cross the line? | **Yes: first feasible design.** Worst violation **0.0087** at high fidelity (passes at ≤ 0.01), L∇B 8.59, aspect ratio 12.05, confirmed by a fresh evaluation. Starting only from the dataset, roughly 27 CPU-hours of simulation along the way vs. 1,400–2,300 per run of the paper's baseline. 1 of 3 starts got there |
 
 **Test 5 in one picture:** median distance to feasible over 20 seed designs, for three
 search methods with the same VMEC++ budget. Lower is better.
@@ -198,6 +199,9 @@ search methods with the same VMEC++ budget. Lower is better.
   polish, ALM-NGOpt halved the best gap to **0.033**. Next: continue the best designs,
   and do the last stretch at high fidelity, because the cheap simulator's error (~0.02)
   is now as big as what's left.
+- **Correcting the cheap search with high-fidelity checks got us over the line (Test 9).**
+  Next: spread out from the feasible design to build a front (compare with the seeded
+  track), and let the surrogate screen candidates to cut the cost per feasible design.
 
 ---
 
@@ -296,7 +300,7 @@ Run from the repo root with the `stellarator` env active. Each script's docstrin
 | `scripts/count_feasible.py` | Pass rate of each requirement across the dataset | ~1 min |
 | `scripts/check_feasibility.py` | Feasibility counts with the benchmark's own function, all 3 benchmarks | ~2 min |
 | `scripts/time_eval.py` | Times one official evaluation | ~2 min |
-| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop, ALM warm start, ALM polish) | 5 min–3 h each |
+| `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop, ALM warm start, ALM polish, multi-fidelity) | 5 min–3 h each |
 
 The first data script downloads the dataset (~600 MB) into the Hugging Face cache.
 

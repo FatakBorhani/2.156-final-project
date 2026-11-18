@@ -1,0 +1,114 @@
+{
+ "scope": "NFP 3, 4x4 Fourier modes",
+ "public_designs": 8074,
+ "public_front_hv": 205.51844659839378,
+ "simulations": {
+  "total": 10054,
+  "cpu_hours": 244.08944444444438,
+  "crashed": 135,
+  "median_seconds": 73.775,
+  "by_ledger": {
+   "loop_b60_random": {
+    "sims": 886,
+    "cpu_hours": 19.670719444444455,
+    "crashed": 0
+   },
+   "loop_b60_screen": {
+    "sims": 900,
+    "cpu_hours": 20.742302777777777,
+    "crashed": 0
+   },
+   "loop_blend_random": {
+    "sims": 197,
+    "cpu_hours": 4.785097222222224,
+    "crashed": 0
+   },
+   "loop_g60_diff_w256_s3k_t0.5": {
+    "sims": 900,
+    "cpu_hours": 17.368136111111117,
+    "crashed": 0
+   },
+   "loop_g60_gmm_k16_n16": {
+    "sims": 900,
+    "cpu_hours": 18.033561111111105,
+    "crashed": 0
+   },
+   "loop_g60_vae_z32_b0.1": {
+    "sims": 900,
+    "cpu_hours": 18.277447222222218,
+    "crashed": 0
+   },
+   "loop_pilotw_l3w2": {
+    "sims": 60,
+    "cpu_hours": 1.1782416666666666,
+    "crashed": 0
+   },
+   "loop_pilotw_l3w3": {
+    "sims": 60,
+    "cpu_hours": 1.158836111111111,
+    "crashed": 0
+   },
+   "loop_w60_random": {
+    "sims": 1440,
+    "cpu_hours": 28.477063888888885,
+    "crashed": 0
+   },
+   "loop_w60_screen": {
+    "sims": 1440,
+    "cpu_hours": 32.45219444444443,
+    "crashed": 0
+   },
+   "paper_baseline": {
+    "sims": 4,
+    "cpu_hours": 0.08192777777777778,
+    "crashed": 0
+   },
+   "parity": {
+    "sims": 237,
+    "cpu_hours": 5.056430555555557,
+    "crashed": 0
+   },
+   "parity_lf": {
+    "sims": 0,
+    "cpu_hours": 0.0,
+    "crashed": 0
+   },
+   "parity_vlf": {
+    "sims": 0,
+    "cpu_hours": 0.0,
+    "crashed": 0
+   },
+   "pilot": {
+    "sims": 800,
+    "cpu_hours": 26.22240277777778,
+    "crashed": 67
+   },
+   "surface": {
+    "sims": 850,
+    "cpu_hours": 39.84598333333328,
+    "crashed": 68
+   },
+   "surface_retry": {
+    "sims": 60,
+    "cpu_hours": 1.5048694444444441,
+    "crashed": 0
+   },
+   "gen_pilot": {
+    "sims": 420,
+    "cpu_hours": 9.234230555555557,
+    "crashed": 0
+   }
+  }
+ },
+ "novelty_0.003": {
+  "novel_passes": 3864,
+  "hv_ours_alone": 206.87744455488712,
+  "hv_public_plus_ours": 208.90954161743522
+ },
+ "novelty_0.01": {
+  "novel_passes": 536,
+  "hv_ours_alone": 199.49592723210537,
+  "hv_public_plus_ours": 207.45167467518098
+ },
+ "improves_public_front": 223
+}

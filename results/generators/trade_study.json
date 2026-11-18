@@ -1,0 +1,426 @@
+{
+ "scope": "NFP 3, 4x4 Fourier modes; public front = public passing designs in that space",
+ "metrics": "feasible = all 5 Benchmark 3 constraints within 1% (constellaration 0.2.6, high fidelity); score = hypervolume over (-L_gradB, A), reference (1, 20); cost = simulations",
+ "architectures": {
+  "blend": {
+   "settings": 2,
+   "models": 2,
+   "finalist": null,
+   "chosen_label": "blend layers 3 window 2.0",
+   "predicted_yield": 0.24735758517928141,
+   "predicted_yield_range": [
+    0.2291766231179773,
+    0.24735758517928141
+   ],
+   "real_pass_rate": 0.44375,
+   "real_pass_rate_range": [
+    0.44375,
+    0.44375
+   ],
+   "loop_score_gain": 0.34703905514879807,
+   "loop_score_gain_range": [
+    0.33230300267271673,
+    0.6240145769355934
+   ]
+  },
+  "gmm": {
+   "settings": 22,
+   "models": 11,
+   "finalist": "gmm_k16_n16",
+   "chosen_label": "model gmm k 16 n 16 prior 1.0",
+   "predicted_yield": 0.34484026627302367,
+   "predicted_yield_range": [
+    0.0,
+    0.4747714178261593
+   ],
+   "real_pass_rate": 0.4666666666666667,
+   "real_pass_rate_range": [
+    0.4666666666666667,
+    0.4666666666666667
+   ],
+   "loop_score_gain": 0.04435786562819999,
+   "loop_score_gain_range": [
+    0.027478798907736746,
+    0.061981088660786554
+   ]
+  },
+  "vae": {
+   "settings": 42,
+   "models": 14,
+   "finalist": "vae_z32_b0.1",
+   "chosen_label": "model vae latent 32 beta 0.1 prior 0.7",
+   "predicted_yield": 0.5470985228267827,
+   "predicted_yield_range": [
+    0.1778778320226282,
+    0.5481784625421439
+   ],
+   "real_pass_rate": 0.15,
+   "real_pass_rate_range": [
+    0.0,
+    0.15
+   ],
+   "loop_score_gain": 0.02830130271944616,
+   "loop_score_gain_range": [
+    0.015219302583687977,
+    0.05245511698461769
+   ]
+  },
+  "cvae": {
+   "settings": 33,
+   "models": 11,
+   "finalist": "cvae_z8_b0.1",
+   "chosen_label": "model cvae latent 8 beta 0.1 prior 1.0",
+   "predicted_yield": 0.2820652551591909,
+   "predicted_yield_range": [
+    0.1140719040814977,
+    0.43852864443960105
+   ],
+   "real_pass_rate": 0.0,
+   "real_pass_rate_range": [
+    0.0,
+    0.0
+   ]
+  },
+  "diff": {
+   "settings": 20,
+   "models": 10,
+   "finalist": "diff_w256_s3k",
+   "chosen_label": "model diff width 256 steps 3000 scaling coef prior 1.0",
+   "predicted_yield": 0.7566278590626938,
+   "predicted_yield_range": [
+    0.03969755334822418,
+    0.8164177246687329
+   ],
+   "real_pass_rate": 0.016666666666666666,
+   "real_pass_rate_range": [
+    0.016666666666666666,
+    0.05
+   ],
+   "loop_score_gain": 0.0,
+   "loop_score_gain_range": [
+    0.0,
+    0.0
+   ]
+  },
+  "diff_edit": {
+   "settings": 30,
+   "models": 10,
+   "finalist": "diff_w256_s3k_edit0.1",
+   "chosen_label": "model diff width 256 steps 3000 scaling coef edit 0.1",
+   "predicted_yield": 0.42621794896932624,
+   "predicted_yield_range": [
+    0.056603429809748224,
+    0.5835301147463027
+   ],
+   "real_pass_rate": 0.0,
+   "real_pass_rate_range": [
+    0.0,
+    0.0
+   ]
+  },
+  "cdiff": {
+   "settings": 20,
+   "models": 4,
+   "finalist": "cdiff_w256_s3k",
+   "chosen_label": "model cdiff width 256 steps 3000 scaling coef prior 1.0 guide 0.0",
+   "predicted_yield": 0.4675716975840261,
+   "predicted_yield_range": [
+    0.14807617266800222,
+    0.5260867564145411
+   ],
+   "real_pass_rate": 0.0,
+   "real_pass_rate_range": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "pilot": {
+  "vae_z32_b0.1": {
+   "simulated": 60,
+   "crashed": 0,
+   "passed": 9,
+   "pass_rate": 0.15,
+   "predicted_pass_rate": 0.638688225285335,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 36,
+    "edge_mirror_le_0.25": 11,
+    "flux_compression_le_0.9": 3,
+    "edge_iota_ge_0.25": 1
+   }
+  },
+  "cvae_z8_b0.1": {
+   "simulated": 60,
+   "crashed": 0,
+   "passed": 0,
+   "pass_rate": 0.0,
+   "predicted_pass_rate": 0.29649717982991575,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 43,
+    "edge_mirror_le_0.25": 17
+   }
+  },
+  "gmm_k16_n16": {
+   "simulated": 60,
+   "crashed": 0,
+   "passed": 28,
+   "pass_rate": 0.4666666666666667,
+   "predicted_pass_rate": 0.7691226300433393,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 27,
+    "vacuum_well_ge_0": 3,
+    "edge_mirror_le_0.25": 1,
+    "flux_compression_le_0.9": 1
+   }
+  },
+  "diff_w256_s3k": {
+   "simulated": 60,
+   "crashed": 0,
+   "passed": 1,
+   "pass_rate": 0.016666666666666666,
+   "predicted_pass_rate": 0.8394245465191529,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 40,
+    "edge_mirror_le_0.25": 14,
+    "flux_compression_le_0.9": 3,
+    "vacuum_well_ge_0": 1,
+    "edge_iota_ge_0.25": 1
+   }
+  },
+  "cdiff_w256_s3k": {
+   "simulated": 60,
+   "crashed": 0,
+   "passed": 0,
+   "pass_rate": 0.0,
+   "predicted_pass_rate": 0.5854739738612823,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 35,
+    "edge_mirror_le_0.25": 23,
+    "vacuum_well_ge_0": 1,
+    "flux_compression_le_0.9": 1
+   }
+  },
+  "diff_w256_s3k_t0.5": {
+   "simulated": 40,
+   "crashed": 0,
+   "passed": 2,
+   "pass_rate": 0.05,
+   "predicted_pass_rate": 0.9650653413952199,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 29,
+    "edge_mirror_le_0.25": 6,
+    "flux_compression_le_0.9": 1,
+    "edge_iota_ge_0.25": 1,
+    "vacuum_well_ge_0": 1
+   }
+  },
+  "diff_w256_s3k_edit0.1": {
+   "simulated": 40,
+   "crashed": 0,
+   "passed": 0,
+   "pass_rate": 0.0,
+   "predicted_pass_rate": 0.5751757567303729,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "edge_mirror_le_0.25": 19,
+    "log10_qi_le_-3.5": 19,
+    "flux_compression_le_0.9": 1,
+    "vacuum_well_ge_0": 1
+   }
+  },
+  "vae_z32_b0.1_t0.3": {
+   "simulated": 40,
+   "crashed": 0,
+   "passed": 0,
+   "pass_rate": 0.0,
+   "predicted_pass_rate": 0.4490476366821726,
+   "strict_novel_passes": 0,
+   "worst_constraint_of_failures": {
+    "log10_qi_le_-3.5": 22,
+    "edge_mirror_le_0.25": 18
+   }
+  }
+ },
+ "blending_real_pass_rate": 0.44375,
+ "loop_runs_300_sims": {
+  "w60_random": {
+   "runs": 3,
+   "sims": 300,
+   "new_passes": 127.33333333333333,
+   "strict_new_passes": 19.666666666666668,
+   "median_novelty": 0.0066173803579252935,
+   "score_gain_mean": 0.2562305043396596,
+   "score_gain_range": [
+    0.203862646412432,
+    0.298714345531522
+   ],
+   "pass_rate_by_round": [
+    0.35,
+    0.422,
+    0.411,
+    0.5,
+    0.439
+   ]
+  },
+  "b60_screen": {
+   "runs": 3,
+   "sims": 300,
+   "new_passes": 176.0,
+   "strict_new_passes": 66.33333333333333,
+   "median_novelty": 0.00796690515771552,
+   "score_gain_mean": 0.5342292856723722,
+   "score_gain_range": [
+    0.41056149708290945,
+    0.6240145769355934
+   ],
+   "pass_rate_by_round": [
+    0.761,
+    0.883,
+    0.717,
+    0.378,
+    0.194
+   ]
+  },
+  "w60_screen": {
+   "runs": 3,
+   "sims": 300,
+   "new_passes": 255.0,
+   "strict_new_passes": 10.333333333333334,
+   "median_novelty": 0.006352612021078007,
+   "score_gain_mean": 0.34703905514879807,
+   "score_gain_range": [
+    0.33230300267271673,
+    0.3649270463855885
+   ],
+   "pass_rate_by_round": [
+    0.533,
+    0.844,
+    0.978,
+    0.944,
+    0.95
+   ]
+  },
+  "g60_vae_z32_b0.1": {
+   "runs": 3,
+   "sims": 300,
+   "new_passes": 109.33333333333333,
+   "strict_new_passes": 1.0,
+   "median_novelty": 0.003852902820306964,
+   "score_gain_mean": 0.02830130271944616,
+   "score_gain_range": [
+    0.015219302583687977,
+    0.05245511698461769
+   ],
+   "pass_rate_by_round": [
+    0.022,
+    0.261,
+    0.506,
+    0.511,
+    0.522
+   ]
+  },
+  "g60_gmm_k16_n16": {
+   "runs": 3,
+   "sims": 300,
+   "new_passes": 162.33333333333334,
+   "strict_new_passes": 0.0,
+   "median_novelty": 0.0038264579684868126,
+   "score_gain_mean": 0.04435786562819999,
+   "score_gain_range": [
+    0.027478798907736746,
+    0.061981088660786554
+   ],
+   "pass_rate_by_round": [
+    0.461,
+    0.544,
+    0.533,
+    0.583,
+    0.583
+   ]
+  },
+  "g60_diff_w256_s3k_t0.5": {
+   "runs": 3,
+   "sims": 300,
+   "new_passes": 19.0,
+   "strict_new_passes": 0.0,
+   "median_novelty": 0.003532212398607938,
+   "score_gain_mean": 0.0,
+   "score_gain_range": [
+    0.0,
+    0.0
+   ],
+   "pass_rate_by_round": [
+    0.0,
+    0.106,
+    0.05,
+    0.072,
+    0.089
+   ]
+  }
+ },
+ "loop_shared_start_score": 207.75523459747447,
+ "buildability_best_L_at_A": {
+  "public": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.129088559238877,
+   "A<=12": 14.807047351352537,
+   "A<=14": 17.790193198195972,
+   "A<=16": 17.790193198195972,
+   "A<=18": 18.27821546933061
+  },
+  "w60_random": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.353715637465916,
+   "A<=12": 14.823540900708053,
+   "A<=14": 17.790193198195972,
+   "A<=16": 17.96762765698794,
+   "A<=18": 18.27821546933061
+  },
+  "b60_screen": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.476196489933697,
+   "A<=12": 14.887794564972065,
+   "A<=14": 17.790193198195972,
+   "A<=16": 18.097347144860844,
+   "A<=18": 18.27821546933061
+  },
+  "w60_screen": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.4818068728991,
+   "A<=12": 14.990944541746707,
+   "A<=14": 17.790193198195972,
+   "A<=16": 17.790193198195972,
+   "A<=18": 18.27821546933061
+  },
+  "g60_vae_z32_b0.1": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.201022850536452,
+   "A<=12": 14.807047351352537,
+   "A<=14": 17.790193198195972,
+   "A<=16": 17.790193198195972,
+   "A<=18": 18.27821546933061
+  },
+  "g60_gmm_k16_n16": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.418163925395605,
+   "A<=12": 14.807047351352537,
+   "A<=14": 17.790193198195972,
+   "A<=16": 17.790193198195972,
+   "A<=18": 18.27821546933061
+  },
+  "g60_diff_w256_s3k_t0.5": {
+   "A<=8": 8.065894026991142,
+   "A<=10": 11.129088559238877,
+   "A<=12": 14.807047351352537,
+   "A<=14": 17.790193198195972,
+   "A<=16": 17.790193198195972,
+   "A<=18": 18.27821546933061
+  }
+ }
+}

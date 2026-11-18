@@ -106,7 +106,7 @@ def propose(proposer: str, n: int, seed: int, ours: dict, layers: int = 1,
 
 
 def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: int, r: int,
-         pub: dict, layers: int = 1, window: float = 1.0) -> list[dict]:
+         pub: dict, layers: int = 1, window: float = 1.0, min_novelty: float = NOVELTY) -> list[dict]:
     """One round's batch: propose, keep novel candidates, then screen or pick at random."""
     training_data.build()
     t = arm_view(load_table(), name); st = ours_status(t)
@@ -120,7 +120,7 @@ def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: in
     A, nov = aspect_ratio(V), nearest_public(V)
     done = t["X"][t["source"] == "ours"]          # don't re-simulate near-copies of our own
     near = NearestNeighbors(n_neighbors=1).fit(done).kneighbors(V)[0][:, 0] if len(done) else np.inf
-    keep = (nov >= NOVELTY) & (near >= NOVELTY) & (A < 19.9)
+    keep = (nov >= min_novelty) & (near >= NOVELTY) & (A < 19.9)
     cands, V, A = [c for c, k in zip(cands, keep) if k], V[keep], A[keep]
     rng = np.random.default_rng(seed * 1000 + r)
     if screen:
@@ -151,7 +151,8 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 
 def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: int,
-        seed: int, workers: int, dry_run: bool, layers: int = 1, window: float = 1.0) -> None:
+        seed: int, workers: int, dry_run: bool, layers: int = 1, window: float = 1.0,
+        min_novelty: float = NOVELTY) -> None:
     import run_sims
     pub = load_public()
     LOGS.mkdir(parents=True, exist_ok=True)
@@ -161,7 +162,7 @@ def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: i
         if r in logged:
             continue
         infile = DATA / f"loop_{name}_r{r}.jsonl"
-        args = (name, proposer, screen, batch, pool, seed, r, pub, layers, window)
+        args = (name, proposer, screen, batch, pool, seed, r, pub, layers, window, min_novelty)
         if dry_run:                               # kept out of DATA so arm_view never sees it
             write_jsonl(LOGS / f"dryrun_{name}_r{r}.jsonl", pick(*args))
             return
@@ -202,6 +203,9 @@ def main() -> None:
                     help="blend: parents from the first k non-dominated layers (1 = front only)")
     ap.add_argument("--window", type=float, default=1.0,
                     help="blend: largest aspect-ratio gap between the two parents")
+    ap.add_argument("--min-novelty", type=float, default=NOVELTY,
+                    help="only consider candidates at least this far from every public design "
+                         "(0.01 = strictly new; passes still count from 0.003)")
     a = ap.parse_args()
     if a.proposer.startswith("gen:"):
         import generators
@@ -210,7 +214,7 @@ def main() -> None:
     elif a.proposer not in ("random", "surface", "blend"):
         ap.error(f"unknown proposer {a.proposer}")
     run(a.name, a.proposer, a.screen, a.rounds, a.batch, a.pool, a.seed, a.workers, a.dry_run,
-        a.layers, a.window)
+        a.layers, a.window, a.min_novelty)
 
 
 if __name__ == "__main__":

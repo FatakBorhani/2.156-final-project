@@ -7,7 +7,7 @@ the aspect-ratio limit drops in small steps (11.5, 11, 10.5, 10, 9.5). Each step
 - starts from the known design closest to feasible *at that limit* (worst violation,
   counting AR above the limit as a violation too), from every earlier ledger;
 - runs Test 9's multi-fidelity finisher (feasibility first, L_gradB only a tie-breaker)
-  and stops at the first design that passes Benchmark 3 with AR <= limit + AR_TOL;
+  and stops at the first design that passes Benchmark 3 with AR <= limit * (1 + AR_TOL);
 - if it fails in MAXIT iterations, gets one extension of EXT_IT iterations from its best
   design, then the chain moves on regardless.
 
@@ -36,7 +36,8 @@ from common import ROOT  # noqa: E402
 from front_test import pareto, read  # noqa: E402
 
 STEPS = [11.5, 11.0, 10.5, 10.0, 9.5]
-MAXIT, EXT_IT, AR_TOL, W_OBJ = 20, 15, 0.05, 0.05
+MAXIT, EXT_IT, W_OBJ = 20, 15, 0.05
+AR_TOL = 0.01  # fraction of the limit: the finisher's own 1% feasibility tolerance on AR
 OUT = ROOT / "results" / "feasibility_tests"
 DATA = ROOT / "data" / "feasibility_tests"
 SOURCES = ["multifid_ledger.jsonl", "front_ledger.jsonl"]  # + this test's own ledger
@@ -62,12 +63,12 @@ def belongs(start: str, name: str) -> bool:
 
 
 def feasible_at(r: dict, ar: float) -> bool:
-    return bool(r.get("feasible")) and r["aspect_ratio"] <= ar + AR_TOL
+    return bool(r.get("feasible")) and r["aspect_ratio"] <= ar * (1 + AR_TOL)
 
 
 def run_step(ar: float, dry: bool, ledger: Path) -> None:
     name = step_name(ar)
-    mf.AR_BOUND, mf.W_OBJ, mf.STOP_ON_FEASIBLE, mf.AR_FEAS_TOL = ar, W_OBJ, True, AR_TOL
+    mf.AR_BOUND, mf.W_OBJ, mf.STOP_ON_FEASIBLE, mf.AR_FEAS_TOL = ar, W_OBJ, True, AR_TOL * ar
     attempts = [(name, MAXIT)] if dry else [(name, MAXIT), (name + "_x", EXT_IT)]
     for attempt, maxit in attempts:
         rows = read(ledger)

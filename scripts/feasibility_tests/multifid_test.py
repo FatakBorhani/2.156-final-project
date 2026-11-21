@@ -48,6 +48,10 @@ B0, B_MIN, SHRINK = 0.02, 0.003, 0.7
 INNER, MAXIT, TOP_HI = 300, 30, 3
 STOP_ON_FEASIBLE = True  # Test 10 sets False to keep improving L_gradB while feasible
 AR_FEAS_TOL = None  # Test 11 sets a number: 'feasible' then also needs AR <= AR_BOUND + tol
+LGB_MIN = None  # Test 13 sets a number: L_gradB >= LGB_MIN becomes a 7th constraint
+LGB_FEAS_TOL = 0.0  # with LGB_MIN: 'feasible' also needs L_gradB >= LGB_MIN - tol
+LOG_ORACLE_BOUNDARY = False  # Test 15 sets True: keep cheap runs' shapes (when kept) as training data
+MAX_MODE = 4  # max poloidal and toroidal mode the finisher varies (Test 18 sets 5; new coefficients start at 0)
 
 OUT = ROOT / "results" / "feasibility_tests"
 DATA = ROOT / "data" / "feasibility_tests"
@@ -64,23 +68,31 @@ def starts() -> list[tuple[str, str, float]]:
     return [(r["start"], r["boundary"], r["worst_hi"]) for r in top]
 
 
+def n_cons() -> int:
+    return 6 if LGB_MIN is None else 7
+
+
 def cons_obj(row: dict, offset: np.ndarray) -> tuple[float, list[float]]:
-    """Objective and constraints; offset (6,) is added to [AR, 5 violations]."""
+    """Objective and constraints; offset (n_cons,) is added to raw_vec: [AR, 5 violations(, L_gradB)]."""
     if not row["ok"]:
-        return W_OBJ, [1.0] * 6
-    raw = np.array([row["aspect_ratio"], *row["violations"]]) + offset
-    return (W_OBJ * (20.0 - row["L_gradB"]) / 20.0,
-            [(raw[0] - AR_BOUND) / AR_BOUND, *(raw[1:] + MARGIN).tolist()])
+        return W_OBJ, [1.0] * n_cons()
+    raw = raw_vec(row) + offset
+    cons = [(raw[0] - AR_BOUND) / AR_BOUND, *(raw[1:6] + MARGIN).tolist()]
+    if LGB_MIN is not None:
+        cons.append((LGB_MIN - raw[6]) / LGB_MIN)
+    return W_OBJ * (20.0 - row["L_gradB"]) / 20.0, cons
 
 
 def is_feasible(row: dict) -> bool:
     """Benchmark 3 feasible, and (if AR_FEAS_TOL is set) within this run's aspect-ratio limit."""
-    return bool(row.get("feasible")) and (AR_FEAS_TOL is None
-                                         or row["aspect_ratio"] <= AR_BOUND + AR_FEAS_TOL)
+    return (bool(row.get("feasible"))
+            and (AR_FEAS_TOL is None or row["aspect_ratio"] <= AR_BOUND + AR_FEAS_TOL)
+            and (LGB_MIN is None or row["L_gradB"] >= LGB_MIN - LGB_FEAS_TOL))
 
 
 def raw_vec(row: dict) -> np.ndarray:
-    return np.array([row["aspect_ratio"], *row["violations"]])
+    extra = [] if LGB_MIN is None else [row["L_gradB"]]
+    return np.array([row["aspect_ratio"], *row["violations"], *extra])
 
 
 def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
@@ -104,8 +116,8 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
                                            penalty_parameters_increase_factor=2.0,
                                            penalty_parameters_max=1e6, bounds_min=B_MIN)
     boundary = rz.set_max_mode_numbers(rz.SurfaceRZFourier.model_validate_json(bjson),
-                                       max_poloidal_mode=4, max_toroidal_mode=4)
-    mask = rz.build_mask(boundary, max_poloidal_mode=4, max_toroidal_mode=4)
+                                       max_poloidal_mode=MAX_MODE, max_toroidal_mode=MAX_MODE)
+    mask = rz.build_mask(boundary, max_poloidal_mode=MAX_MODE, max_toroidal_mode=MAX_MODE)
     x0, unravel = pytree.mask_and_ravel(pytree=boundary, mask=mask)
     scale = rz.compute_infinity_norm_spectrum_scaling_fun(
         poloidal_modes=boundary.poloidal_modes.flatten(),
@@ -138,9 +150,9 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
         cur_hi = check_hi([x], 0)[0]
         log({k2: v for k2, v in cur_vlo.items() if k2 != "boundary"}, 0, "start_vlo")
         offset = raw_vec(cur_hi) - raw_vec(cur_vlo)
-        obj, cons = cons_obj(cur_hi, np.zeros(6))
+        obj, cons = cons_obj(cur_hi, np.zeros(n_cons()))
         state = al.AugmentedLagrangianState(
-            x=jnp.array(x), multipliers=jnp.zeros(6), penalty_parameters=jnp.full(6, P0),
+            x=jnp.array(x), multipliers=jnp.zeros(n_cons()), penalty_parameters=jnp.full(n_cons(), P0),
             objective=jnp.array(obj), constraints=jnp.array(cons), bounds=jnp.full(len(x), B0))
         bounds, rng = B0, np.random.RandomState(123)
         print(f"[{name}] start: high {cur_hi['worst']:.4f}, very low {cur_vlo['worst']:.4f}", flush=True)
@@ -170,7 +182,8 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
                         val = lag(*cons_obj(row, offset))
                         oracle.tell(cand, val)
                         cands.append((val, np.array(cand.value), row))
-                        log({k2: v for k2, v in row.items() if k2 != "boundary"}, k, "oracle")
+                        log({k2: v for k2, v in row.items() if k2 != "boundary" or LOG_ORACLE_BOUNDARY},
+                            k, "oracle")
                 running = [(fu, c) for fu, c in running if fu not in done]
 
             cands.sort(key=lambda t: t[0])
@@ -183,8 +196,8 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
                 if len(picks) == TOP_HI:
                     break
             his = check_hi([xx for xx, _ in picks], k)
-            cur_val = lag(*cons_obj(cur_hi, np.zeros(6)))
-            scored = [(lag(*cons_obj(h, np.zeros(6))), xx, v, h)
+            cur_val = lag(*cons_obj(cur_hi, np.zeros(n_cons())))
+            scored = [(lag(*cons_obj(h, np.zeros(n_cons()))), xx, v, h)
                       for (xx, v), h in zip(picks, his) if h["ok"]]
             feasible = [s for s in scored if is_feasible(s[3])]
             best = min(feasible or scored, key=lambda s: s[0], default=None)
@@ -196,7 +209,7 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
                 offset = raw_vec(cur_hi) - raw_vec(v)
             else:
                 bounds = max(B_MIN, bounds * SHRINK)
-            obj, cons = cons_obj(cur_hi, np.zeros(6))
+            obj, cons = cons_obj(cur_hi, np.zeros(n_cons()))
             state = al.update_augmented_lagrangian_state(
                 x=jnp.array(x), objective=jnp.array(obj), constraints=jnp.array(cons),
                 state=state, settings=alset)

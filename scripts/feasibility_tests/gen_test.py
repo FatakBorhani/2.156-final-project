@@ -278,7 +278,7 @@ def screen_and_finish(dry: bool) -> None:
         picks += [by_id[i] for _, i in sorted(ok)[:(2 if dry else TOP_HI)]]
     hi = {r["id"]: r for r in evaluate_designs(picks, evals, fidelity="high_fidelity")}
 
-    mf.W_OBJ, mf.STOP_ON_FEASIBLE, mf.AR_FEAS_TOL = W_OBJ, True, AR_TOL
+    mf.W_OBJ, mf.STOP_ON_FEASIBLE = W_OBJ, True
     done = {r["start"] for r in read(ledger)}
     for ar in (STEPS[:1] if dry else STEPS):
         name = "gen_" + step_name(ar)
@@ -291,7 +291,7 @@ def screen_and_finish(dry: bool) -> None:
             print(f"[{name}] no generated design solved at high fidelity; skipping", flush=True)
             continue
         g, i = min(ok)
-        mf.AR_BOUND, mf.MAXIT = ar, (2 if dry else MAXIT)
+        mf.AR_BOUND, mf.AR_FEAS_TOL, mf.MAXIT = ar, AR_TOL * ar, (2 if dry else MAXIT)
         print(f"[{name}] AR <= {ar}: start {g:.4f} ({i}, high-fidelity AR {hi[i]['aspect_ratio']:.2f})",
               flush=True)
         mf.run_start(name, by_id[i]["boundary"], dry, ledger)

@@ -1,0 +1,107 @@
+{
+  "hypervolume_before": 76.53078044528198,
+  "hypervolume_after": 81.38365030287854,
+  "n_feasible_total": 55,
+  "n_feasible_chain": 5,
+  "steps": {
+    "ar11p5": {
+      "ar_limit": 11.5,
+      "attempts": [
+        "ar11p5",
+        "ar11p5_x"
+      ],
+      "iterations": 26,
+      "very_low_runs": 8100,
+      "high_runs": 80,
+      "reached": true,
+      "high_runs_to_first_feasible": 42,
+      "very_low_runs_to_first_feasible": 4200,
+      "best_gap": 0.008305095349584235,
+      "best_worst": 0.008305095349584235,
+      "best_aspect_ratio": 11.57881875008184,
+      "best_L_gradB": 8.609794891101133,
+      "hours": 1.4
+    },
+    "ar11": {
+      "ar_limit": 11.0,
+      "attempts": [
+        "ar11",
+        "ar11_x"
+      ],
+      "iterations": 35,
+      "very_low_runs": 10500,
+      "high_runs": 107,
+      "reached": false,
+      "high_runs_to_first_feasible": null,
+      "very_low_runs_to_first_feasible": null,
+      "best_gap": 0.012754379375439218,
+      "best_worst": 0.012754379375439218,
+      "best_aspect_ratio": 11.052503280287075,
+      "best_L_gradB": 8.65317992812264,
+      "hours": 1.98
+    },
+    "ar10p5": {
+      "ar_limit": 10.5,
+      "attempts": [
+        "ar10p5",
+        "ar10p5_x"
+      ],
+      "iterations": 35,
+      "very_low_runs": 10500,
+      "high_runs": 107,
+      "reached": false,
+      "high_runs_to_first_feasible": null,
+      "very_low_runs_to_first_feasible": null,
+      "best_gap": 0.03238667198157546,
+      "best_worst": 0.03238667198157546,
+      "best_aspect_ratio": 10.769476203799094,
+      "best_L_gradB": 8.412314789714255,
+      "hours": 1.68
+    },
+    "ar10": {
+      "ar_limit": 10.0,
+      "attempts": [
+        "ar10",
+        "ar10_x"
+      ],
+      "iterations": 35,
+      "very_low_runs": 10500,
+      "high_runs": 107,
+      "reached": false,
+      "high_runs_to_first_feasible": null,
+      "very_low_runs_to_first_feasible": null,
+      "best_gap": 0.03927867582404989,
+      "best_worst": 0.03822410415484904,
+      "best_aspect_ratio": 10.392786758240499,
+      "best_L_gradB": 8.143208708524698,
+      "hours": 1.84
+    },
+    "ar9p5": {
+      "ar_limit": 9.5,
+      "attempts": [
+        "ar9p5",
+        "ar9p5_x"
+      ],
+      "iterations": 35,
+      "very_low_runs": 10500,
+      "high_runs": 107,
+      "reached": false,
+      "high_runs_to_first_feasible": null,
+      "very_low_runs_to_first_feasible": null,
+      "best_gap": 0.046188009676706825,
+      "best_worst": 0.046188009676706825,
+      "best_aspect_ratio": 9.934155759142469,
+      "best_L_gradB": 7.688856622445,
+      "hours": 1.79
+    }
+  },
+  "front": [
+    {
+      "src": "chain",
+      "start": "ar11p5",
+      "aspect_ratio": 11.553499758185435,
+      "L_gradB": 8.635191851411687,
+      "worst": 0.00835492344322145
+    }
+  ]
+}

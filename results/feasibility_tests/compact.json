@@ -1,0 +1,940 @@
+{
+  "hypervolume_before": 125.33119852511516,
+  "hypervolume_after": 128.18257219714357,
+  "n_feasible_total": 262,
+  "n_feasible_compact": 8,
+  "rungs": {
+    "ar11p25_lgb8p75": {
+      "ar_limit": 11.25,
+      "lgb_floor": 8.75,
+      "attempts": [
+        "ar11p25_lgb8p75",
+        "ar11p25_lgb8p75_x"
+      ],
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 92,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 9,
+      "best_gap": 0.010770066887550429,
+      "best_worst": 0.010770066887550429,
+      "best_aspect_ratio": 11.34125938374797,
+      "best_L_gradB": 8.815342779118925,
+      "hours": 1.64
+    },
+    "ar11_lgb8p4": {
+      "ar_limit": 11.0,
+      "lgb_floor": 8.4,
+      "attempts": [
+        "ar11_lgb8p4",
+        "ar11_lgb8p4_x"
+      ],
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 92,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 3,
+      "best_gap": 0.014674658227826955,
+      "best_worst": 0.014674658227826955,
+      "best_aspect_ratio": 11.157889101196956,
+      "best_L_gradB": 8.678293364966303,
+      "hours": 1.51
+    },
+    "ar10p75_lgb8": {
+      "ar_limit": 10.75,
+      "lgb_floor": 8.0,
+      "attempts": [
+        "ar10p75_lgb8",
+        "ar10p75_lgb8_x"
+      ],
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 92,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 2,
+      "best_gap": 0.015842377774078376,
+      "best_worst": 0.015842377774078376,
+      "best_aspect_ratio": 10.831411590357256,
+      "best_L_gradB": 8.427419933329265,
+      "hours": 1.51
+    },
+    "ar10p5_lgb7p6": {
+      "ar_limit": 10.5,
+      "lgb_floor": 7.6,
+      "attempts": [
+        "ar10p5_lgb7p6",
+        "ar10p5_lgb7p6_x"
+      ],
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 92,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 2,
+      "best_gap": 0.01730875113640375,
+      "best_worst": 0.01730875113640375,
+      "best_aspect_ratio": 10.618305815009363,
+      "best_L_gradB": 8.257277420679731,
+      "hours": 1.4
+    },
+    "ar10p25_lgb7p2": {
+      "ar_limit": 10.25,
+      "lgb_floor": 7.2,
+      "attempts": [
+        "ar10p25_lgb7p2",
+        "ar10p25_lgb7p2_x"
+      ],
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 92,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 2,
+      "best_gap": 0.027867869768843034,
+      "best_worst": 0.027867869768843034,
+      "best_aspect_ratio": 10.440368487515135,
+      "best_L_gradB": 8.11135575332366,
+      "hours": 1.38
+    },
+    "ar10_lgb6p8": {
+      "ar_limit": 10.0,
+      "lgb_floor": 6.8,
+      "attempts": [
+        "ar10_lgb6p8",
+        "ar10_lgb6p8_x"
+      ],
+      "iterations": 30,
+      "very_low_runs": 9000,
+      "high_runs": 92,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 2,
+      "best_gap": 0.032431463900978584,
+      "best_worst": 0.032431463900978584,
+      "best_aspect_ratio": 10.225104637837791,
+      "best_L_gradB": 7.9106370725095445,
+      "hours": 1.39
+    },
+    "ar9p75_lgb6p4": {
+      "ar_limit": 9.75,
+      "lgb_floor": 6.4,
+      "attempts": [
+        "ar9p75_lgb6p4"
+      ],
+      "iterations": 4,
+      "very_low_runs": 1500,
+      "high_runs": 13,
+      "reached": false,
+      "high_runs_to_first_success": null,
+      "feasible_designs": 1,
+      "best_gap": 0.09012538412126211,
+      "best_worst": 0.04935533610009202,
+      "best_aspect_ratio": 10.628722495182306,
+      "best_L_gradB": 8.318251435731765,
+      "hours": 0.22
+    }
+  },
+  "front": [
+    {
+      "src": "compact",
+      "start": "ar11_lgb8p4_x",
+      "aspect_ratio": 11.258818869231789,
+      "L_gradB": 8.648435431253976,
+      "worst": 0.009129280815122114
+    },
+    {
+      "src": "compact",
+      "start": "ar11p25_lgb8p75_x",
+      "aspect_ratio": 11.395048376263542,
+      "L_gradB": 8.657305669015585,
+      "worst": 0.009807799171120735
+    },
+    {
+      "src": "compact",
+      "start": "ar11p25_lgb8p75_x",
+      "aspect_ratio": 11.401333843772449,
+      "L_gradB": 8.691811363139033,
+      "worst": 0.009665905254193165
+    },
+    {
+      "src": "test12",
+      "start": "gen_ar11p5",
+      "aspect_ratio": 11.580134572908797,
+      "L_gradB": 9.29776962343943,
+      "worst": 0.0038957645192698414
+    },
+    {
+      "src": "test12",
+      "start": "gen_ar11p5",
+      "aspect_ratio": 11.580925630463502,
+      "L_gradB": 9.303647535415694,
+      "worst": 0.007792723252694042
+    },
+    {
+      "src": "test12",
+      "start": "gen_ar11p5",
+      "aspect_ratio": 11.646399310230988,
+      "L_gradB": 9.35487133993853,
+      "worst": 0.009322367453263678
+    },
+    {
+      "src": "test12",
+      "start": "gen_ar11p5",
+      "aspect_ratio": 11.650386643950181,
+      "L_gradB": 9.372862990630933,
+      "worst": 0.009282849597644693
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 11.803918875010838,
+      "L_gradB": 9.551269330308784,
+      "worst": 0.006631852653685425
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 11.80931509403334,
+      "L_gradB": 9.561081163819033,
+      "worst": 0.008403829159381157
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 11.850921837822767,
+      "L_gradB": 9.596789779086821,
+      "worst": 0.005769978275358538
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 12.011939562694637,
+      "L_gradB": 9.753981756234953,
+      "worst": 0.00821224865712963
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 12.016003194020918,
+      "L_gradB": 9.77931008864028,
+      "worst": 0.0034904520589058258
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 12.016936489723827,
+      "L_gradB": 9.78251769987041,
+      "worst": 0.00847652160304094
+    },
+    {
+      "src": "test13",
+      "start": "ar12p5_lgb10",
+      "aspect_ratio": 12.208989643251474,
+      "L_gradB": 9.973126868453813,
+      "worst": 0.009877087383412229
+    },
+    {
+      "src": "test13",
+      "start": "ar13_lgb10p75",
+      "aspect_ratio": 12.550422350970884,
+      "L_gradB": 10.45078086773509,
+      "worst": 0.009511165014222302
+    },
+    {
+      "src": "test13",
+      "start": "ar13_lgb10p75",
+      "aspect_ratio": 12.67559866195041,
+      "L_gradB": 10.559258220691893,
+      "worst": 0.0031310387318892146
+    },
+    {
+      "src": "test13",
+      "start": "ar13_lgb10p75",
+      "aspect_ratio": 12.690781224890687,
+      "L_gradB": 10.604341829998123,
+      "worst": 0.009652094414594867
+    },
+    {
+      "src": "test13",
+      "start": "ar13_lgb10p75",
+      "aspect_ratio": 12.714606288888469,
+      "L_gradB": 10.636593314657077,
+      "worst": 0.0011878106392497756
+    },
+    {
+      "src": "test13",
+      "start": "ar13_lgb10p75",
+      "aspect_ratio": 12.813409165040394,
+      "L_gradB": 10.747210914950456,
+      "worst": 0.009440687242343846
+    },
+    {
+      "src": "test13",
+      "start": "ar13p5_lgb11p5",
+      "aspect_ratio": 13.22921024803668,
+      "L_gradB": 11.154598542252124,
+      "worst": 0.008194804731902039
+    },
+    {
+      "src": "test13",
+      "start": "ar13p5_lgb11p5",
+      "aspect_ratio": 13.407992488992102,
+      "L_gradB": 11.389534386758362,
+      "worst": 9.876634018857189e-06
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.719218759049065,
+      "L_gradB": 11.725284004199613,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.741088718459041,
+      "L_gradB": 11.768488549281798,
+      "worst": 0.008333653101117682
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.764087544816498,
+      "L_gradB": 11.772331933363725,
+      "worst": 0.004845984956126616
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.781194095772978,
+      "L_gradB": 11.844124340636602,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.80458070911753,
+      "L_gradB": 11.854679549426775,
+      "worst": 0.0093852190242641
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.833889192203912,
+      "L_gradB": 11.913874503509238,
+      "worst": 0.00011224076803958585
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.89814153086444,
+      "L_gradB": 11.952616849073076,
+      "worst": 0.0004145299481558443
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.90584110118888,
+      "L_gradB": 11.99979789490518,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.909398754403039,
+      "L_gradB": 12.015593205041515,
+      "worst": 0.003337920348395735
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 13.937471053600396,
+      "L_gradB": 12.032842197236473,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 14.129118332001912,
+      "L_gradB": 12.25649803820417,
+      "worst": 0.007768609238476554
+    },
+    {
+      "src": "test13",
+      "start": "ar14p25_lgb12p25",
+      "aspect_ratio": 14.131503278620933,
+      "L_gradB": 12.265185992527757,
+      "worst": 0.009182442995259388
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.201296964155311,
+      "L_gradB": 12.338517753205533,
+      "worst": 0.0053562196993243005
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.24133965422182,
+      "L_gradB": 12.375873938032683,
+      "worst": 0.00669413363260528
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.279002022304091,
+      "L_gradB": 12.472639735756463,
+      "worst": 0.004051896591004324
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.328363897186136,
+      "L_gradB": 12.510161345649951,
+      "worst": 0.005192863894012412
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.340026044474685,
+      "L_gradB": 12.513939488822572,
+      "worst": 0.007471200899677248
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.348513567076482,
+      "L_gradB": 12.51860464766952,
+      "worst": 0.003588981990660299
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.36309455080945,
+      "L_gradB": 12.559786230195206,
+      "worst": 0.006278863762477803
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.452923340634495,
+      "L_gradB": 12.664733914722145,
+      "worst": 0.002699879098959881
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.52707086415645,
+      "L_gradB": 12.758043345857633,
+      "worst": 0.00016918159234583877
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.568395473128374,
+      "L_gradB": 12.811737496392404,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.594586803141846,
+      "L_gradB": 12.819102105891224,
+      "worst": 0.0028713880081231275
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.610942798216072,
+      "L_gradB": 12.866441610179013,
+      "worst": 0.002516039975975431
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.72955024882514,
+      "L_gradB": 12.999214089214869,
+      "worst": 0.009873939603817787
+    },
+    {
+      "src": "test13",
+      "start": "ar15_lgb13",
+      "aspect_ratio": 14.731242356735404,
+      "L_gradB": 13.020231470504832,
+      "worst": 0.00347713186918343
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.808178812600259,
+      "L_gradB": 13.089975369580456,
+      "worst": 0.008251711360998495
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.831532803302496,
+      "L_gradB": 13.100191980382554,
+      "worst": 0.009911865991233932
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.8437929476228,
+      "L_gradB": 13.139661001792415,
+      "worst": 0.006445667508018259
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.910725371223302,
+      "L_gradB": 13.237234933718437,
+      "worst": 0.00458074100884444
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.928886443465514,
+      "L_gradB": 13.253914650966845,
+      "worst": 0.0031136761266211516
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.95528522912788,
+      "L_gradB": 13.285562638364539,
+      "worst": 0.0016432658904775978
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 14.973056146302408,
+      "L_gradB": 13.288477522729275,
+      "worst": 0.008838701660359684
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.018805596199124,
+      "L_gradB": 13.353886439202544,
+      "worst": 0.008195230711271151
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.034393243718517,
+      "L_gradB": 13.377653081968102,
+      "worst": 0.007761608035006745
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.053131760276317,
+      "L_gradB": 13.418935543541295,
+      "worst": 0.0038259026048231043
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.08310143966503,
+      "L_gradB": 13.428363935329028,
+      "worst": 0.005044342013968232
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.1661550141222,
+      "L_gradB": 13.518819339640796,
+      "worst": 0.008118940565535748
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.278852288583439,
+      "L_gradB": 13.647434152747525,
+      "worst": 0.00781835774237167
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.414680744565137,
+      "L_gradB": 13.842698883825454,
+      "worst": 0.007528552856683619
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.453936514408587,
+      "L_gradB": 13.873390886408087,
+      "worst": 0.008706542375157842
+    },
+    {
+      "src": "test13",
+      "start": "ar16_lgb14",
+      "aspect_ratio": 15.4707992518753,
+      "L_gradB": 13.877800976330061,
+      "worst": 0.007278123130470085
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.481722358545511,
+      "L_gradB": 13.908225593510647,
+      "worst": 0.0031727749333382454
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.481872199611159,
+      "L_gradB": 13.918536168950961,
+      "worst": 0.002972803383768025
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.497009637246931,
+      "L_gradB": 13.92676129333131,
+      "worst": 0.009505342877348102
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.54952110696422,
+      "L_gradB": 14.047300243010021,
+      "worst": 0.008182447052168307
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.586017616071695,
+      "L_gradB": 14.0682586045844,
+      "worst": 0.007989533955872144
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.597470516947567,
+      "L_gradB": 14.091532336786496,
+      "worst": 0.005880451719276536
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.704984104413224,
+      "L_gradB": 14.235162015296712,
+      "worst": 0.009439923025168337
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.71652923773186,
+      "L_gradB": 14.271673870467701,
+      "worst": 0.009361468576793541
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.780332325541812,
+      "L_gradB": 14.375927965215142,
+      "worst": 0.008376232431344681
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.810292085711286,
+      "L_gradB": 14.416843781237468,
+      "worst": 0.009825747811414638
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.859808258830826,
+      "L_gradB": 14.511153262940269,
+      "worst": 0.005352878159144504
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 15.947315905336325,
+      "L_gradB": 14.590987835799048,
+      "worst": 0.008718501491108326
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 16.020853102928676,
+      "L_gradB": 14.754836240862257,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 16.030523831624976,
+      "L_gradB": 14.79868403632387,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 16.04526916918288,
+      "L_gradB": 14.823404599389162,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar17_lgb15",
+      "aspect_ratio": 16.091578922838313,
+      "L_gradB": 14.860392150952517,
+      "worst": 0.0005350662765168934
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.116194398810624,
+      "L_gradB": 14.894275216236917,
+      "worst": 0.001729809826951875
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.119363962561902,
+      "L_gradB": 14.908920378113809,
+      "worst": 0.002333034001372271
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.148688923888894,
+      "L_gradB": 14.961285775610524,
+      "worst": 0.004115121525936516
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.19121608684088,
+      "L_gradB": 14.99148131931614,
+      "worst": 0.009462676827963154
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.20851933713468,
+      "L_gradB": 15.009463029532682,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.316314445428283,
+      "L_gradB": 15.09854769181278,
+      "worst": 0.0064279030986175
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.364411851649358,
+      "L_gradB": 15.301397296359886,
+      "worst": 0.002836885200280724
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.39089006705092,
+      "L_gradB": 15.35715556574732,
+      "worst": 0.001445261916788684
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16",
+      "aspect_ratio": 16.6094697682958,
+      "L_gradB": 15.586824132453533,
+      "worst": 0.006001612605102125
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.682746904270424,
+      "L_gradB": 15.82266197864234,
+      "worst": 0.004095764738936961
+    },
+    {
+      "src": "test13",
+      "start": "ar18_lgb16_x",
+      "aspect_ratio": 16.736311400774444,
+      "L_gradB": 15.863603632738126,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.77112763508119,
+      "L_gradB": 15.908079491714332,
+      "worst": 0.0029735924197149544
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.80821522694586,
+      "L_gradB": 15.970105014607281,
+      "worst": 0.00294162105367641
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.835120641639485,
+      "L_gradB": 16.042052745390873,
+      "worst": 0.006068389824376297
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.898421883835425,
+      "L_gradB": 16.05100088771971,
+      "worst": 0.005571063717489976
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.90903701715885,
+      "L_gradB": 16.062955223646078,
+      "worst": 0.007145230219472839
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.929051783861333,
+      "L_gradB": 16.119779185819986,
+      "worst": 0.0032790029608158783
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.94469630567033,
+      "L_gradB": 16.126638186956832,
+      "worst": 0.002216348309516241
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 16.986132969507977,
+      "L_gradB": 16.211644070919785,
+      "worst": 0.004440860726343183
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 16.995733878789704,
+      "L_gradB": 16.215152667598794,
+      "worst": 0.004431465150717985
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17",
+      "aspect_ratio": 17.007681063476237,
+      "L_gradB": 16.219274551291974,
+      "worst": 0.007852004685423606
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.057690146119175,
+      "L_gradB": 16.287855215750923,
+      "worst": 0.0024948221240785884
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.074244956226668,
+      "L_gradB": 16.290680765978856,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.088368716109873,
+      "L_gradB": 16.305132176960274,
+      "worst": 0.006156071167603194
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.102753527312434,
+      "L_gradB": 16.31016536817531,
+      "worst": 0.0
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.105268677856436,
+      "L_gradB": 16.31059385248867,
+      "worst": 0.004773323678624867
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.116866465001227,
+      "L_gradB": 16.32449739666914,
+      "worst": 0.0026974626753773884
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.131970140277964,
+      "L_gradB": 16.3487456518027,
+      "worst": 0.0031347024743327368
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.133782834593443,
+      "L_gradB": 16.349026116140358,
+      "worst": 0.0005736051207426231
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.14688561674506,
+      "L_gradB": 16.35632123162843,
+      "worst": 0.007715836484401757
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.14874175354397,
+      "L_gradB": 16.35776277816677,
+      "worst": 0.005606142668249119
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.14897112345217,
+      "L_gradB": 16.36014949567592,
+      "worst": 0.0025292173062363738
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.15201390150914,
+      "L_gradB": 16.360297451343445,
+      "worst": 0.0038285773195970868
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.15350642161228,
+      "L_gradB": 16.361784417431053,
+      "worst": 0.004011054443163076
+    },
+    {
+      "src": "test13",
+      "start": "ar19_lgb17_x",
+      "aspect_ratio": 17.157490688070048,
+      "L_gradB": 16.372035852673285,
+      "worst": 0.0015826020326961756
+    }
+  ]
+}

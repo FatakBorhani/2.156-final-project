@@ -8,7 +8,11 @@ Fatak Borhani, Joel Pederson, & Leif Akerley
 > means, what we've found so far, and the plan. Setup and scripts are at the bottom.
 > *Drafted 2026-11-11 by Leif with Claude. Edit anything you disagree with.*
 
-Key dates: **mid-term report Wed Nov 18** · poster Fri Dec 4 · poster session + final report Wed Dec 9.
+Key dates: mid-term report Wed Nov 18 · **results freeze Mon Nov 30** · poster Fri Dec 4 · poster session + final report Wed Dec 9.
+
+Two tracks: **Track A** (Leif) starts from the dataset alone, where no design passes; see
+"What the feasibility tests showed". **Track B** (Joel) starts from the passing designs other
+teams posted to the public leaderboard; see "Track B".
 
 ---
 
@@ -210,6 +214,77 @@ search methods with the same VMEC++ budget. Lower is better.
 
 ---
 
+## Track B: starting from the public designs (Nov 14–22)
+
+*Joel, with Claude Code. Code in `scripts/seeded/`. Every number is from real
+high-fidelity simulations with the official scorer (constellaration 0.2.6).*
+
+Track A starts from the dataset, where no design passes. Track B starts from the ~8,000
+passing designs (3 field periods, 4×4 modes) that other teams posted to the public
+leaderboard, credited by submitter, and asks how cheaply ML can find **new** passing
+designs near them. A design counts as ours only if it is at least 0.003 from every public
+design (RMS distance between the two surfaces, after putting both in one standard form).
+
+**Scope.** Track B's gains are within the 3-field-period, 4×4 design space, whose public
+front scores 205.5. The full leaderboard front (285.3) is made of higher-resolution designs
+with 3 and 4 field periods, and nothing in this section improves on it.
+
+| | |
+|---|---|
+| Scorer check | The paper's baseline re-scores to 129.80; 237 public designs re-score with 0 pass/fail flips |
+| Simulations through Nov 18 | 10,054 (~244 CPU-hours), giving 3,864 new passing designs |
+| Public 4×4 front + ours | 205.5 → **208.9** (counting only designs ≥ 0.01 from any public one: 207.45) |
+| Our designs alone | 206.9 (paper baseline: 129.8) |
+
+What we learned:
+
+1. **Random tweaks fail.** 0 of 784 random perturbations of public designs passed: passing
+   designs sit on a thin surface.
+2. **Blending works.** Mixing two public designs passes ~44% of the time and fills gaps in
+   the front (best: A 14.93 with L∇B 18.27, where the public best was 17.8). Blends are
+   interpolations, so we credit both parents.
+3. **Closeness decides passing, for every method.** About 99% of designs within 0.005 of a
+   public design pass, ~80% at 0.007–0.01, and 9–22% beyond 0.01.
+4. **The ML screen pays off where passing is rare.** The screen is gradient-boosted trees on
+   the 80 shape coefficients, deciding which candidates to simulate. Equal budgets, 3 seeds
+   per arm:
+   - On ordinary blends it finds as many new designs as random picks in about half the
+     simulations.
+   - Restricted to clearly new designs (≥ 0.01), it finds 514 passing designs in 900
+     simulations against random's 115 (57% vs 13%).
+   - In every comparison the front gain matches random picks.
+   - Which model does the screening barely matters (6 compared). What matters is training
+     on designs like the ones being judged.
+5. **Generators don't help.** VAE, conditional VAE, diffusion and conditional diffusion
+   (144 settings tuned offline):
+   - The screen predicted 30–97% of their designs would pass; 0–15% did, mostly missing QI
+     by a few percent. A Gaussian mixture passed 47%, but only with near-copies.
+   - Snapping generated designs back onto the passing surface lifts them to 67–77%, but
+     random local blends pass 90%.
+6. **Blending can't reach the full front.** At full resolution, blends of front designs land
+   0.5–1.5 L∇B below it (`fullres.py`).
+
+### Track B's method on Track A's designs (Nov 21–22)
+
+- **Blending from Leif's designs, no public data** (`track_a_loop.py`; 6 runs, 853
+  simulations):
+  - Track A's 4×4 front goes from 143.6 to **146.75**; every run adds +2.1 to +2.4.
+  - Screened and random picks add the same, and pass 57% vs 52% of the time.
+  - The new designs beat Track A's best L∇B at every A from 9.5 to 13, but none is more
+    compact than A 10.46.
+- **Test 18's designs don't need mode 5** (`modes5_control.py`). All 122 still pass with
+  every 5th-order term removed, with unchanged scores. So Track A's best result is a 4×4
+  result, directly comparable to the public 4×4 front.
+
+### Running now: refining the leaders' designs (Nov 22–23)
+
+`refine_leaders.py` starts the paper's optimizer (ALM-NGOpt) at 8 designs from the full public
+front (A 5.9–19.8). Each run keeps the design's own resolution, scores every step at high
+fidelity, and tries to raise L∇B without raising A. The question is whether there is room
+above the leaders' front. Results Mon Nov 23.
+
+---
+
 ## The plan
 
 ### Objective
@@ -306,8 +381,33 @@ Run from the repo root with the `stellarator` env active. Each script's docstrin
 | `scripts/check_feasibility.py` | Feasibility counts with the benchmark's own function, all 3 benchmarks | ~2 min |
 | `scripts/time_eval.py` | Times one official evaluation | ~2 min |
 | `scripts/feasibility_tests/` | The feasibility tests above (surrogate, fidelity, search, PCA vs. VAE, loop, ALM warm start, ALM polish, multi-fidelity) | 5 min–3 h each |
+| `scripts/seeded/` | Track B; see the next table | |
 
 The first data script downloads the dataset (~600 MB) into the Hugging Face cache.
+
+**Track B (`scripts/seeded/`).** Each script's docstring gives its commands. Simulations go
+through `run_sims.py`, which uses the evaluator's worker function with one thread per
+simulation and a time limit. One thread per simulation alone took the slowest simulations
+from 5–40 minutes to about one, and lifted throughput from ~130 to ~370 per hour on 8 workers.
+
+| Script | What it does |
+|---|---|
+| `public_designs.py` | Builds the table of public leaderboard designs (and the paper's baseline) |
+| `parity_check.py` | Scorer check: do we reproduce the leaderboard's numbers? |
+| `shapes.py` · `families.py` | One standard form for boundaries, a distance between them, families and novelty |
+| `training_data.py` · `screen.py` | The screening models' training table, and the models |
+| `perturb.py` · `surface.py` | No-ML proposers: random tweaks, and blends along the passing surface |
+| `loop.py` | The pipeline: propose → screen → simulate, in rounds; screened vs. random arms |
+| `run_sims.py` | Parallel simulations, one thread each, with a time limit |
+| `generators.py` · `gen_study.py` · `gen_pilot.py` | Generative proposers, their offline trade study, and the real-simulation pilot |
+| `repair.py` · `screen_compare.py` | QI repair pilot; six screening models compared, with Shapley values |
+| `fullres.py` | Blending at the full leaderboard's resolution |
+| `report_numbers.py` | Every Track B number in the mid-term report |
+| `track_a_loop.py` · `modes5_control.py` | Track B's method on Track A's designs; Test 18 without mode 5 |
+| `refine_leaders.py` | The paper's optimizer, started at the full front's designs |
+
+Figures: `notebooks/seeded_figures.ipynb` and `notebooks/generator_trade_study.ipynb`,
+saved to `results/seeded/` and `results/generators/`.
 
 Evaluator input is one design per line, `{"id": ..., "boundary": <SurfaceRZFourier JSON>}`:
 
@@ -325,13 +425,16 @@ so in a `.py` file call it under `if __name__ == "__main__":`. Piping code into
 
 ```
 Docs/          presentations, figures/
-scripts/       evaluator + dataset analysis
-results/       small JSON/JSONL outputs worth keeping
-data/          local inputs and scratch outputs (gitignored)
+scripts/       evaluator + dataset analysis; feasibility_tests/ (Track A), seeded/ (Track B)
+notebooks/     Track B figures
+results/       small outputs worth keeping: feasibility_tests/, seeded/, generators/, report/
+data/          local inputs, simulation logs and scratch outputs (gitignored)
 ```
 
 ## AI use
 
 Claude (Claude Code) helped set up the environment, write the scripts in `scripts/`,
-analyze the dataset, make the figure, and draft this README. The course requires an
+analyze the dataset, make the figure, and draft this README. For Track B, Claude Code wrote
+the code in `scripts/seeded/` and the notebooks, ran and monitored the simulation campaigns,
+and drafted the Track B section, at Joel's direction. The course requires an
 AI-use statement on every submission, so keep this section current.

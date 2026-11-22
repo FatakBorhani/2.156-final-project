@@ -238,13 +238,15 @@ with 3 and 4 field periods, and nothing in this section improves on it.
 
 What we learned:
 
-1. **Random tweaks fail.** 0 of 784 random perturbations of public designs passed: passing
-   designs sit on a thin surface.
+1. **Random tweaks fail.** None of 784 random perturbations of public designs gave a new
+   passing design. 15 passed, but all were near-copies, within 0.0025 of a public design:
+   passing designs sit on a thin surface.
 2. **Blending works.** Mixing two public designs passes ~44% of the time and fills gaps in
    the front (best: A 14.93 with L∇B 18.27, where the public best was 17.8). Blends are
    interpolations, so we credit both parents.
-3. **Closeness decides passing, for every method.** About 99% of designs within 0.005 of a
-   public design pass, ~80% at 0.007–0.01, and 9–22% beyond 0.01.
+3. **Closeness decides passing.** For randomly picked blends, ~99% of designs within 0.005
+   of a public design pass, 59–80% at 0.007–0.01, and 9–22% beyond 0.01. The screen lifts
+   that last group to 38–58%.
 4. **The ML screen pays off where passing is rare.** The screen is gradient-boosted trees on
    the 80 shape coefficients, deciding which candidates to simulate. Equal budgets, 3 seeds
    per arm:
@@ -252,11 +254,15 @@ What we learned:
      simulations.
    - Restricted to clearly new designs (≥ 0.01), it finds 514 passing designs in 900
      simulations against random's 115 (57% vs 13%).
-   - In every comparison the front gain matches random picks.
-   - Which model does the screening barely matters (6 compared). What matters is training
-     on designs like the ones being judged.
+   - The front gain matches random picks on ordinary blends and on clearly new designs. On
+     wider blends the screen added slightly more (0.35 vs 0.26 after 300 simulations).
+   - Which model does the screening barely matters (6 compared). On held-out blends they
+     rank well (AUC ~0.93 even excluding near-copies of training designs).
+   - Every model over-predicts generated designs. Adding generated designs to training
+     helps only on near-copies of them (AUC 0.87). On genuinely new generated designs the
+     screen stays near chance (AUC 0.55).
 5. **Generators don't help.** VAE, conditional VAE, diffusion and conditional diffusion
-   (144 settings tuned offline):
+   (145 settings of 39 models, tuned offline):
    - The screen predicted 30–97% of their designs would pass; 0–15% did, mostly missing QI
      by a few percent. A Gaussian mixture passed 47%, but only with near-copies.
    - Snapping generated designs back onto the passing surface lifts them to 67–77%, but
@@ -270,8 +276,8 @@ What we learned:
   simulations):
   - Track A's 4×4 front goes from 143.6 to **146.75**; every run adds +2.1 to +2.4.
   - Screened and random picks add the same, and pass 57% vs 52% of the time.
-  - The new designs beat Track A's best L∇B at every A from 9.5 to 13, but none is more
-    compact than A 10.46.
+  - The new designs beat Track A's best L∇B at almost every A from 10.5 to 15.6 (all but a
+    sliver near A 12.3), but none is more compact than A 10.46.
 - **Test 18's designs don't need mode 5** (`modes5_control.py`). All 122 still pass with
   every 5th-order term removed, with unchanged scores. So Track A's best result is a 4×4
   result, directly comparable to the public 4×4 front.

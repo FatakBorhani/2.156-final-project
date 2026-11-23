@@ -25,6 +25,9 @@ warm-starts from the best passing design in its ledger (same A bound).
     python scripts/seeded/refine_leaders.py box <start_id>  # first-step sizes, no simulations
     python scripts/seeded/refine_leaders.py chain <start_id> [--budget 1000] [--hours 20]
     python scripts/seeded/refine_leaders.py report
+
+--tag <name> keeps a variant (e.g. a wider --box) in its own ledger, <start_id>_<name>.jsonl:
+it neither resumes from nor appends to the untagged ledger. `report --tag <name>` reports it.
 """
 
 from __future__ import annotations
@@ -204,14 +207,19 @@ def box(sid: str, modes: int, per_round: int, sizes=(0.02, 0.05, 0.1)) -> None:
         print(f"  box {b:<6} step (~RMS surface distance): median {np.median(d):.4f}, max {max(d):.4f}; NGOpt picks {inner}")
 
 
-def chain(sid: str, budget: int, hours: float, box_size: float, per_round: int, modes: int, dry: bool) -> None:
+def ledger_of(sid: str, tag: str = "", dry: bool = False) -> Path:
+    return CHAINS / f"{sid}{'_' + tag if tag else ''}{'_dry' if dry else ''}.jsonl"
+
+
+def chain(sid: str, budget: int, hours: float, box_size: float, per_round: int, modes: int, dry: bool,
+          tag: str = "") -> None:
     import jax.numpy as jnp
 
     import constellaration.optimization.augmented_lagrangian as al
 
     s = start_of(sid)
     CHAINS.mkdir(parents=True, exist_ok=True)
-    ledger = CHAINS / f"{sid}{'_dry' if dry else ''}.jsonl"
+    ledger = ledger_of(sid, tag, dry)
     prior = [json.loads(x) for x in ledger.open()] if ledger.exists() else []
     a_bound = s["A"]
     start_json = s["boundary"]
@@ -273,14 +281,14 @@ def chain(sid: str, budget: int, hours: float, box_size: float, per_round: int, 
     run.close()
 
 
-def report() -> None:
+def report(tag: str = "") -> None:
     rows, A, L, front = public_front()
     base = hypervolume(A, L)
     starts = json.loads(STARTS.read_text())
     allA, allL = [], []
     print(f"public front HV {base:.3f}")
     for s in starts:
-        led = CHAINS / f"{s['id']}.jsonl"
+        led = ledger_of(s["id"], tag)
         if not led.exists():
             print(f"  {s['id']}: not started"); continue
         rs = [json.loads(x) for x in led.open()]
@@ -309,15 +317,16 @@ def main() -> None:
     ap.add_argument("--per-round", type=int, default=150, help="optimizer evaluations per ALM round")
     ap.add_argument("--modes", type=int, default=3, help="free modes: max(|m|, |n|) <= this")
     ap.add_argument("--dry", action="store_true", help="3 simulations, separate ledger")
+    ap.add_argument("--tag", default="", help="variant name: its own ledger, no resume from the untagged one")
     a = ap.parse_args()
     if a.cmd == "pick":
         pick(a.n)
     elif a.cmd == "box":
         box(a.start, a.modes, a.per_round)
     elif a.cmd == "chain":
-        chain(a.start, a.budget, a.hours, a.box, a.per_round, a.modes, a.dry)
+        chain(a.start, a.budget, a.hours, a.box, a.per_round, a.modes, a.dry, a.tag)
     else:
-        report()
+        report(a.tag)
 
 
 if __name__ == "__main__":

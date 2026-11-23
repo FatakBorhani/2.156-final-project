@@ -377,9 +377,13 @@ def check_proposers() -> None:
                 ignore=("A_geom", "arm", "round", "pred_pass", "pred_L", "pred_crash"))  # added by pick
 
     t0 = time.time()
-    compare("proposers: modes5_control.designs() vs data/track_a/modes5_control_designs.jsonl",
-            quiet(modes5_control.designs), read_jsonl(TRACK_A / "modes5_control_designs.jsonl"), t0,
-            ignore=())
+    # Leif's modes5_feasible_designs.jsonl only grows (122 rows on Nov 21, 192 after Nov 22), and
+    # designs() walks it in order, so the recorded designs must be an unchanged prefix of the replay.
+    replayed, recorded = quiet(modes5_control.designs), read_jsonl(TRACK_A / "modes5_control_designs.jsonl")
+    extra = len(replayed) - len(recorded)
+    compare("proposers: modes5_control.designs() vs data/track_a/modes5_control_designs.jsonl"
+            + (f" (first {len(recorded)}; the source file has grown by {extra} designs since)" if extra > 0 else ""),
+            replayed[:len(recorded)] if extra > 0 else replayed, recorded, t0, ignore=())
 
 
 def check_loop() -> None:

@@ -10,6 +10,8 @@ Each round:
          P(no crash) * P(pass) * (predicted score gain over the current front + 0.1)
      and pick the top `batch`, skipping any within 0.003 of an earlier pick.
      no --screen: pick `batch` at random (the no-ML arm).
+     --nearest: no model either; take the candidates closest to the public designs first
+     (a distance-only control for the screen).
   4. simulate the batch at full accuracy (run_sims.py: evaluate.py's simulator with a
      450 s limit per design), log the round to data/seeded/logs/loop_<name>.jsonl.
 
@@ -106,8 +108,9 @@ def propose(proposer: str, n: int, seed: int, ours: dict, layers: int = 1,
 
 
 def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: int, r: int,
-         pub: dict, layers: int = 1, window: float = 1.0, min_novelty: float = NOVELTY) -> list[dict]:
-    """One round's batch: propose, keep novel candidates, then screen or pick at random."""
+         pub: dict, layers: int = 1, window: float = 1.0, min_novelty: float = NOVELTY,
+         nearest: bool = False) -> list[dict]:
+    """One round's batch: propose, keep novel candidates, then screen, take the nearest, or pick at random."""
     training_data.build()
     t = arm_view(load_table(), name); st = ours_status(t)
     mine = st["novel_pass"]
@@ -127,6 +130,8 @@ def pick(name: str, proposer: str, screen: bool, batch: int, pool: int, seed: in
         p = Screen().fit(t).predict(V)
         score = (1 - p["p_crash"]) * p["p_pass"] * (hv_gain(A, p["L_gradB"], fA, fL) + 0.1)
         order = np.argsort(-score)
+    elif nearest:                                 # distance-only control: closest to public first
+        order = np.argsort(nov[keep], kind="stable")
     else:
         order = rng.permutation(len(cands))
     chosen = []
@@ -152,7 +157,7 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: int,
         seed: int, workers: int, dry_run: bool, layers: int = 1, window: float = 1.0,
-        min_novelty: float = NOVELTY) -> None:
+        min_novelty: float = NOVELTY, nearest: bool = False) -> None:
     import run_sims
     pub = load_public()
     LOGS.mkdir(parents=True, exist_ok=True)
@@ -162,7 +167,7 @@ def run(name: str, proposer: str, screen: bool, rounds: int, batch: int, pool: i
         if r in logged:
             continue
         infile = DATA / f"loop_{name}_r{r}.jsonl"
-        args = (name, proposer, screen, batch, pool, seed, r, pub, layers, window, min_novelty)
+        args = (name, proposer, screen, batch, pool, seed, r, pub, layers, window, min_novelty, nearest)
         if dry_run:                               # kept out of DATA so arm_view never sees it
             write_jsonl(LOGS / f"dryrun_{name}_r{r}.jsonl", pick(*args))
             return
@@ -193,6 +198,8 @@ def main() -> None:
     ap.add_argument("--proposer", default="blend",
                     help="random, surface, blend, or gen:<name> (a generators.FINALISTS entry)")
     ap.add_argument("--screen", action="store_true")
+    ap.add_argument("--nearest", action="store_true",
+                    help="no model: pick the candidates closest to the public designs (distance-only control)")
     ap.add_argument("--rounds", type=int, default=4)
     ap.add_argument("--batch", type=int, default=120)
     ap.add_argument("--pool", type=int, default=4000)
@@ -207,6 +214,8 @@ def main() -> None:
                     help="only consider candidates at least this far from every public design "
                          "(0.01 = strictly new; passes still count from 0.003)")
     a = ap.parse_args()
+    if a.screen and a.nearest:
+        ap.error("--screen and --nearest are alternatives; pick one")
     if a.proposer.startswith("gen:"):
         import generators
         if a.proposer[4:] not in generators.FINALISTS:
@@ -214,7 +223,7 @@ def main() -> None:
     elif a.proposer not in ("random", "surface", "blend"):
         ap.error(f"unknown proposer {a.proposer}")
     run(a.name, a.proposer, a.screen, a.rounds, a.batch, a.pool, a.seed, a.workers, a.dry_run,
-        a.layers, a.window, a.min_novelty)
+        a.layers, a.window, a.min_novelty, a.nearest)
 
 
 if __name__ == "__main__":

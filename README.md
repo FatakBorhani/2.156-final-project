@@ -214,7 +214,7 @@ search methods with the same VMEC++ budget. Lower is better.
 
 ---
 
-## Track B: starting from the public designs (Nov 14–22)
+## Track B: starting from the public designs (Nov 14–23)
 
 *Joel, with Claude Code. Code in `scripts/seeded/`. Every number is from real
 high-fidelity simulations with the official scorer (constellaration 0.2.6).*
@@ -227,7 +227,8 @@ design (RMS distance between the two surfaces, after putting both in one standar
 
 **Scope.** Track B's gains are within the 3-field-period, 4×4 design space, whose public
 front scores 205.5. The full leaderboard front (285.3) is made of higher-resolution designs
-with 3 and 4 field periods, and nothing in this section improves on it.
+with 3 and 4 field periods. Only the refinement at the end of this section improves on it,
+by 0.013.
 
 | | |
 |---|---|
@@ -282,12 +283,37 @@ What we learned:
   every 5th-order term removed, with unchanged scores. So Track A's best result is a 4×4
   result, directly comparable to the public 4×4 front.
 
-### Running now: refining the leaders' designs (Nov 22–23)
+### Refining the leaders' designs (Nov 22–23)
 
-`refine_leaders.py` starts the paper's optimizer (ALM-NGOpt) at 8 designs from the full public
-front (A 5.9–19.8). Each run keeps the design's own resolution, scores every step at high
-fidelity, and tries to raise L∇B without raising A. The question is whether there is room
-above the leaders' front. Results Mon Nov 23.
+`refine_leaders.py` starts the paper's optimizer (ALM-NGOpt) at 8 designs spread along the full
+public front (A 5.9–19.8) and tries to raise L∇B without raising A. Each run keeps the design's
+own resolution (modes up to 3 free) and scores every step at high fidelity. 7,036 simulations
+(163 CPU-hours), stopped after 24 of the planned 26 hours.
+
+**The leaders' front is locally tight.**
+
+| Start | Field periods | A | L∇B | Best L∇B gain at the same or lower A |
+|---|---|---|---|---|
+| pub-8768 | 3 | 5.91 | 5.28 | none (22% of its simulations failed) |
+| pub-690c | 3 | 8.50 | 11.06 | +0.020 |
+| pub-2406 | 3 | 9.25 | 12.21 | +0.011 |
+| pub-5bbe | 3 | 10.96 | 14.92 | +0.003 |
+| pub-3c66 | 3 | 12.76 | 18.02 | +0.015 |
+| pub-b7d9 | 4 | 14.30 | 21.60 | none |
+| pub-f52c | 4 | 16.74 | 26.48 | +0.001 |
+| pub-69b2 | 4 | 19.76 | 32.18 | +0.006 |
+
+- The largest gain is 0.18% of L∇B. The full front's score goes from 285.271 to 285.284
+  (+0.013), mostly from designs just above the front at slightly larger A than their start.
+- 5 of the 6 gains came within the first ~100 simulations, and the next 600–900 per run added
+  nothing. The sixth, pub-3c66, improved only late: +0.011 at simulation 735, +0.015 by 894.
+- The gains are real: our scorer reproduces every start's public L∇B to within 3e-6. Some
+  spend the start's constraint slack (pub-2406's worst violation goes 0.002 → 0.0097); others
+  keep the same worst violation (pub-5bbe, pub-3c66, pub-f52c, pub-69b2).
+- **None of these designs counts as ours.** Each improved design is 0.00002–0.0016 from its
+  start, and every design above the front is within 0.0026 of a public design (our threshold
+  is 0.003). They are the leaders' designs, slightly improved, and credited to them.
+- Only one optimizer setting was tried (search box 0.05, modes up to 3).
 
 ---
 

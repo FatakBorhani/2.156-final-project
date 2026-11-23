@@ -274,24 +274,28 @@ What we learned:
      screen stays near chance (AUC 0.55).
 5. **Generators don't help.** VAE, conditional VAE, diffusion and conditional diffusion
    (145 settings of 39 models, tuned offline):
-   - The screen predicted 30–97% of their designs would pass; 0–15% did, mostly missing QI
-     by a few percent. A Gaussian mixture passed 47%, but only with near-copies.
+   - The screen predicted 30–97% of their designs would pass; 0–15% did. Two-thirds of the
+     failures miss mainly on QI, by a median of 8%. A Gaussian mixture passed 47%, but only
+     with near-copies.
    - Snapping generated designs back onto the passing surface lifts them to 67–77%, but
      random local blends pass 90%.
-6. **Blending can't reach the full front.** At full resolution, blends of front designs land
-   0.5–1.5 L∇B below it (`fullres.py`).
+6. **Blending can't reach the full front.** At full resolution, the 12 passing blends of front
+   designs (of 60) land 0.4–1.5 L∇B below it (`fullres.py`).
 
 ### Track B's method on Track A's designs (Nov 21–22)
 
 - **Blending from Leif's designs, no public data** (`track_a_loop.py`; 6 runs, 853
   simulations):
-  - Track A's 4×4 front goes from 143.6 to **146.75**; every run adds +2.1 to +2.4.
+  - Each run adds +2.1 to +2.4 to the front of Leif's committed 4×4 designs (138.8). Pooled,
+    and with Test 18's designs cut to 4×4, Track A's front goes from 143.6 to **146.75**.
+    Leif's later Test 20 reaches 147.2 on its own.
   - Screened and random picks add the same, and pass 57% vs 52% of the time.
   - The new designs beat Track A's best L∇B at almost every A from 10.5 to 15.6 (all but a
     sliver near A 12.3), but none is more compact than A 10.46.
 - **Test 18's designs don't need mode 5** (`modes5_control.py`). All 122 still pass with
-  every 5th-order term removed, with unchanged scores. So Track A's best result is a 4×4
-  result, directly comparable to the public 4×4 front.
+  every 5th-order term removed, with unchanged scores. So Test 18's result is a 4×4 result,
+  directly comparable to the public 4×4 front. Test 20, which came later, deliberately moves
+  modes 4–5 and hasn't been checked this way.
 
 ### Refining the leaders' designs (Nov 22–23)
 
@@ -300,7 +304,7 @@ public front (A 5.9–19.8) and tries to raise L∇B without raising A. Each run
 own resolution (modes up to 3 free) and scores every step at high fidelity. 7,036 simulations
 (163 CPU-hours), stopped after 24 of the planned 26 hours.
 
-**The leaders' front is locally tight.**
+**The leaders' front is locally tight: little room within the region searched.**
 
 | Start | Field periods | A | L∇B | Best L∇B gain at the same or lower A |
 |---|---|---|---|---|
@@ -323,7 +327,10 @@ own resolution (modes up to 3 free) and scores every step at high fidelity. 7,03
 - **None of these designs counts as ours.** Each improved design is 0.00002–0.0016 from its
   start, and every design above the front is within 0.0026 of a public design (our threshold
   is 0.003). They are the leaders' designs, slightly improved, and credited to them.
-- Only one optimizer setting was tried (search box 0.05, modes up to 3).
+- **"Locally" means within about 0.005 of each start.** That is as far as this setting's search
+  reached (median 0.0003–0.003 over 5,795 stored designs). After the first round most of the
+  optimizer's suggestions failed the constraints, which is why later simulations added little.
+  Only one setting was tried (search box 0.05, modes up to 3); a wider search is untested.
 
 ---
 

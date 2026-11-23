@@ -247,6 +247,12 @@ by 0.013.
 | Public 4×4 front + ours | 205.5 → **208.9** (counting only designs ≥ 0.01 from any public one: 207.45) |
 | Our designs alone | 206.9 (paper baseline: 129.8) |
 
+Novelty was checked against the public designs stored at 4×4 only. About 90 of the 3,864 (2.4%)
+turn out to be within 0.003 of a public 3-field-period design stored at a higher resolution,
+whose extra terms are tiny. The scores above haven't been recomputed without them yet. The 1,199
+public 4×4 designs with 4 field periods are outside Track B's scope (with them, the public 4×4
+front scores 232.8).
+
 What we learned:
 
 1. **Random tweaks fail.** None of 784 random perturbations of public designs gave a new
@@ -275,7 +281,7 @@ What we learned:
 5. **Generators don't help.** VAE, conditional VAE, diffusion and conditional diffusion
    (145 settings of 39 models, tuned offline):
    - The screen predicted 30–97% of their designs would pass; 0–15% did. Two-thirds of the
-     failures miss mainly on QI, by a median of 8%. A Gaussian mixture passed 47%, but only
+     failures miss mainly on QI, by a median of 10%. A Gaussian mixture passed 47%, but only
      with near-copies.
    - Snapping generated designs back onto the passing surface lifts them to 67–77%, but
      random local blends pass 90%.
@@ -292,10 +298,10 @@ What we learned:
   - Screened and random picks add the same, and pass 57% vs 52% of the time.
   - The new designs beat Track A's best L∇B at almost every A from 10.5 to 15.6 (all but a
     sliver near A 12.3), but none is more compact than A 10.46.
-- **Test 18's designs don't need mode 5** (`modes5_control.py`). All 122 still pass with
-  every 5th-order term removed, with unchanged scores. So Test 18's result is a 4×4 result,
-  directly comparable to the public 4×4 front. Test 20, which came later, deliberately moves
-  modes 4–5 and hasn't been checked this way.
+- **Test 18's designs don't need mode 5** (`modes5_control.py`). The 122 designs Test 18 had on
+  Nov 21 all still pass with every 5th-order term removed, with unchanged scores, so that result
+  is a 4×4 result. The 70 Test 18 designs added since, and Test 20, which deliberately moves
+  modes 4–5, haven't been checked this way.
 
 ### Refining the leaders' designs (Nov 22–23)
 

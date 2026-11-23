@@ -314,7 +314,7 @@ own resolution (modes up to 3 free) and scores every step at high fidelity. 7,03
 
 | Start | Field periods | A | L∇B | Best L∇B gain at the same or lower A |
 |---|---|---|---|---|
-| pub-8768 | 3 | 5.91 | 5.28 | none (22% of its simulations failed) |
+| pub-8768 | 3 | 5.91 | 5.28 | none (22% of its simulations crashed) |
 | pub-690c | 3 | 8.50 | 11.06 | +0.020 |
 | pub-2406 | 3 | 9.25 | 12.21 | +0.011 |
 | pub-5bbe | 3 | 10.96 | 14.92 | +0.003 |

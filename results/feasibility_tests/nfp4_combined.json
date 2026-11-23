@@ -1,0 +1,9 @@
+{
+  "hypervolume_nfp3": 144.4001561287026,
+  "hypervolume_nfp3_plus_nfp4": 144.4001561287026,
+  "hypervolume_nfp4_alone": 0.0,
+  "n_feasible_nfp3": 562,
+  "n_feasible_nfp4": 0,
+  "nfp4_most_compact": null,
+  "nfp4_best_L_gradB": null
+}

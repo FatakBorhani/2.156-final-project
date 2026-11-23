@@ -52,6 +52,8 @@ LGB_MIN = None  # Test 13 sets a number: L_gradB >= LGB_MIN becomes a 7th constr
 LGB_FEAS_TOL = 0.0  # with LGB_MIN: 'feasible' also needs L_gradB >= LGB_MIN - tol
 LOG_ORACLE_BOUNDARY = False  # Test 15 sets True: keep cheap runs' shapes (when kept) as training data
 MAX_MODE = 4  # max poloidal and toroidal mode the finisher varies (Test 18 sets 5; new coefficients start at 0)
+ALPHA = 1.5  # search-space scaling exp(-ALPHA * max(|m|, |n|)): finer modes take smaller steps
+SCALE_FLOOR_MODE = None  # Test 20 sets 3: modes above it step like mode 3 (at 1.5, mode 5 moved ~400x less than mode 1)
 
 OUT = ROOT / "results" / "feasibility_tests"
 DATA = ROOT / "data" / "feasibility_tests"
@@ -121,8 +123,10 @@ def run_start(name: str, bjson: str, dry: bool, ledger: Path) -> None:
     x0, unravel = pytree.mask_and_ravel(pytree=boundary, mask=mask)
     scale = rz.compute_infinity_norm_spectrum_scaling_fun(
         poloidal_modes=boundary.poloidal_modes.flatten(),
-        toroidal_modes=boundary.toroidal_modes.flatten(), alpha=1.5,
+        toroidal_modes=boundary.toroidal_modes.flatten(), alpha=ALPHA,
     ).reshape(boundary.poloidal_modes.shape)
+    if SCALE_FLOOR_MODE is not None:
+        scale = np.maximum(scale, np.exp(-ALPHA * SCALE_FLOOR_MODE))
     scale = jnp.array(np.concatenate([scale[mask.r_cos], scale[mask.z_sin]]))
     x = np.asarray(jnp.array(x0) / scale)
 

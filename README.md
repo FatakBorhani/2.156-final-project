@@ -224,7 +224,7 @@ search methods with the same VMEC++ budget. Lower is better.
 
 ---
 
-## Track B: starting from the public designs (Nov 14–22)
+## Track B: starting from the public designs (Nov 14–23)
 
 *Joel, with Claude Code. Code in `scripts/seeded/`. Every number is from real
 high-fidelity simulations with the official scorer (constellaration 0.2.6).*
@@ -237,7 +237,8 @@ design (RMS distance between the two surfaces, after putting both in one standar
 
 **Scope.** Track B's gains are within the 3-field-period, 4×4 design space, whose public
 front scores 205.5. The full leaderboard front (285.3) is made of higher-resolution designs
-with 3 and 4 field periods, and nothing in this section improves on it.
+with 3 and 4 field periods. Only the refinement at the end of this section improves on it,
+by 0.013.
 
 | | |
 |---|---|
@@ -246,15 +247,23 @@ with 3 and 4 field periods, and nothing in this section improves on it.
 | Public 4×4 front + ours | 205.5 → **208.9** (counting only designs ≥ 0.01 from any public one: 207.45) |
 | Our designs alone | 206.9 (paper baseline: 129.8) |
 
+Novelty was checked against the public designs stored at 4×4 only. About 90 of the 3,864 (2.4%)
+turn out to be within 0.003 of a public 3-field-period design stored at a higher resolution,
+whose extra terms are tiny. The scores above haven't been recomputed without them yet. The 1,199
+public 4×4 designs with 4 field periods are outside Track B's scope (with them, the public 4×4
+front scores 232.8).
+
 What we learned:
 
-1. **Random tweaks fail.** 0 of 784 random perturbations of public designs passed: passing
-   designs sit on a thin surface.
+1. **Random tweaks fail.** None of 784 random perturbations of public designs gave a new
+   passing design. 15 passed, but all were near-copies, within 0.0025 of a public design:
+   passing designs sit on a thin surface.
 2. **Blending works.** Mixing two public designs passes ~44% of the time and fills gaps in
    the front (best: A 14.93 with L∇B 18.27, where the public best was 17.8). Blends are
    interpolations, so we credit both parents.
-3. **Closeness decides passing, for every method.** About 99% of designs within 0.005 of a
-   public design pass, ~80% at 0.007–0.01, and 9–22% beyond 0.01.
+3. **Closeness decides passing.** For randomly picked blends, ~99% of designs within 0.005
+   of a public design pass, 59–80% at 0.007–0.01, and 9–22% beyond 0.01. The screen lifts
+   that last group to 38–58%.
 4. **The ML screen pays off where passing is rare.** The screen is gradient-boosted trees on
    the 80 shape coefficients, deciding which candidates to simulate. Equal budgets, 3 seeds
    per arm:
@@ -262,36 +271,72 @@ What we learned:
      simulations.
    - Restricted to clearly new designs (≥ 0.01), it finds 514 passing designs in 900
      simulations against random's 115 (57% vs 13%).
-   - In every comparison the front gain matches random picks.
-   - Which model does the screening barely matters (6 compared). What matters is training
-     on designs like the ones being judged.
+   - The front gain matches random picks on ordinary blends and on clearly new designs. On
+     wider blends the screen added slightly more (0.35 vs 0.26 after 300 simulations).
+   - Which model does the screening barely matters (6 compared). On held-out blends they
+     rank well (AUC ~0.93 even excluding near-copies of training designs).
+   - Every model over-predicts generated designs. Adding generated designs to training
+     helps only on near-copies of them (AUC 0.87). On genuinely new generated designs the
+     screen stays near chance (AUC 0.55).
 5. **Generators don't help.** VAE, conditional VAE, diffusion and conditional diffusion
-   (144 settings tuned offline):
-   - The screen predicted 30–97% of their designs would pass; 0–15% did, mostly missing QI
-     by a few percent. A Gaussian mixture passed 47%, but only with near-copies.
+   (145 settings of 39 models, tuned offline):
+   - The screen predicted 30–97% of their designs would pass; 0–15% did. Two-thirds of the
+     failures miss mainly on QI, by a median of 10%. A Gaussian mixture passed 47%, but only
+     with near-copies.
    - Snapping generated designs back onto the passing surface lifts them to 67–77%, but
      random local blends pass 90%.
-6. **Blending can't reach the full front.** At full resolution, blends of front designs land
-   0.5–1.5 L∇B below it (`fullres.py`).
+6. **Blending can't reach the full front.** At full resolution, the 12 passing blends of front
+   designs (of 60) land 0.4–1.5 L∇B below it (`fullres.py`).
 
 ### Track B's method on Track A's designs (Nov 21–22)
 
 - **Blending from Leif's designs, no public data** (`track_a_loop.py`; 6 runs, 853
   simulations):
-  - Track A's 4×4 front goes from 143.6 to **146.75**; every run adds +2.1 to +2.4.
+  - Each run adds +2.1 to +2.4 to the front of Leif's committed 4×4 designs (138.8). Pooled,
+    and with Test 18's designs cut to 4×4, Track A's front goes from 143.6 to **146.75**.
+    Leif's later Test 20 reaches 147.2 on its own.
   - Screened and random picks add the same, and pass 57% vs 52% of the time.
-  - The new designs beat Track A's best L∇B at every A from 9.5 to 13, but none is more
-    compact than A 10.46.
-- **Test 18's designs don't need mode 5** (`modes5_control.py`). All 122 still pass with
-  every 5th-order term removed, with unchanged scores. So Track A's best result is a 4×4
-  result, directly comparable to the public 4×4 front.
+  - The new designs beat Track A's best L∇B at almost every A from 10.5 to 15.6 (all but a
+    sliver near A 12.3), but none is more compact than A 10.46.
+- **Test 18's designs don't need mode 5** (`modes5_control.py`). The 122 designs Test 18 had on
+  Nov 21 all still pass with every 5th-order term removed, with unchanged scores, so that result
+  is a 4×4 result. The 70 Test 18 designs added since, and Test 20, which deliberately moves
+  modes 4–5, haven't been checked this way.
 
-### Running now: refining the leaders' designs (Nov 22–23)
+### Refining the leaders' designs (Nov 22–23)
 
-`refine_leaders.py` starts the paper's optimizer (ALM-NGOpt) at 8 designs from the full public
-front (A 5.9–19.8). Each run keeps the design's own resolution, scores every step at high
-fidelity, and tries to raise L∇B without raising A. The question is whether there is room
-above the leaders' front. Results Mon Nov 23.
+`refine_leaders.py` starts the paper's optimizer (ALM-NGOpt) at 8 designs spread along the full
+public front (A 5.9–19.8) and tries to raise L∇B without raising A. Each run keeps the design's
+own resolution (modes up to 3 free) and scores every step at high fidelity. 7,036 simulations
+(163 CPU-hours), stopped after 24 of the planned 26 hours.
+
+**The leaders' front is locally tight: little room within the region searched.**
+
+| Start | Field periods | A | L∇B | Best L∇B gain at the same or lower A |
+|---|---|---|---|---|
+| pub-8768 | 3 | 5.91 | 5.28 | none (22% of its simulations failed) |
+| pub-690c | 3 | 8.50 | 11.06 | +0.020 |
+| pub-2406 | 3 | 9.25 | 12.21 | +0.011 |
+| pub-5bbe | 3 | 10.96 | 14.92 | +0.003 |
+| pub-3c66 | 3 | 12.76 | 18.02 | +0.015 |
+| pub-b7d9 | 4 | 14.30 | 21.60 | none |
+| pub-f52c | 4 | 16.74 | 26.48 | +0.001 |
+| pub-69b2 | 4 | 19.76 | 32.18 | +0.006 |
+
+- The largest gain is 0.18% of L∇B. The full front's score goes from 285.271 to 285.284
+  (+0.013), mostly from designs just above the front at slightly larger A than their start.
+- 5 of the 6 gains came within the first ~100 simulations, and the next 600–900 per run added
+  nothing. The sixth, pub-3c66, improved only late: +0.011 at simulation 735, +0.015 by 894.
+- The gains are real: our scorer reproduces every start's public L∇B to within 3e-6. Some
+  spend the start's constraint slack (pub-2406's worst violation goes 0.002 → 0.0097); others
+  keep the same worst violation (pub-5bbe, pub-3c66, pub-f52c, pub-69b2).
+- **None of these designs counts as ours.** Each improved design is 0.00002–0.0016 from its
+  start, and every design above the front is within 0.0026 of a public design (our threshold
+  is 0.003). They are the leaders' designs, slightly improved, and credited to them.
+- **"Locally" means within about 0.005 of each start.** That is as far as this setting's search
+  reached (median 0.0003–0.003 over 5,795 stored designs). After the first round most of the
+  optimizer's suggestions failed the constraints, which is why later simulations added little.
+  Only one setting was tried (search box 0.05, modes up to 3); a wider search is untested.
 
 ---
 

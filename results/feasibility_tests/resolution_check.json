@@ -1,0 +1,23 @@
+{
+ "all": {
+  "n": 32,
+  "failed": 0,
+  "still_feasible": 28,
+  "lost": [
+   "6a484e30d7",
+   "320e9933b3",
+   "2b15e7436a",
+   "7058a1e6df"
+  ],
+  "median_seconds": 1422.75,
+  "max_change_worst": 0.00361794563588967,
+  "max_change_L_gradB": 0.25831304731317317,
+  "max_change_by_constraint": {
+   "iota": 0.0010253185382267382,
+   "log10_qi": 0.004086182394269881,
+   "mirror": 0.0022062017767996434,
+   "flux_compression": 0.018269964619283596,
+   "vacuum_well": 0.0011965161668915187
+  }
+ }
+}

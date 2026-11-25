@@ -1,0 +1,12 @@
+{
+  "hypervolume_before": 157.91953824122317,
+  "hypervolume_with_A": 159.89728586859485,
+  "hypervolume_with_A_and_B": 160.1302356665515,
+  "n_feasible_A": 48,
+  "n_feasible_B": 25,
+  "n_copies_A": 89,
+  "top_A": [
+    14.0,
+    13.475
+  ]
+}

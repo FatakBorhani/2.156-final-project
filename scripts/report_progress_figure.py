@@ -1,4 +1,4 @@
-"""Track A progress figure for the update after the mid-term report (Tests 10-20).
+"""Track A progress figure for the update after the mid-term report (Tests 10-22).
 
 Left: Track A's hypervolume after each test. Right: all Track A feasible designs and their
 front, next to the three feasible designs of Proxima's ALM-NGOpt baseline entry (values
@@ -24,7 +24,7 @@ from report_front_figure import BLUE, GREY, INK, ORANGE, OUT, REF, draw_front, f
 
 DATA = HERE.parent / "data" / "feasibility_tests"
 LEDGERS = ["multifid", "front", "chain", "gen", "ladder", "compact", "diffusion", "descent",
-           "diffusion2", "descent2", "modes5", "finemodes", "raise"]
+           "diffusion2", "descent2", "modes5", "finemodes", "raise", "stretch", "fatten", "stretch2", "fatten2"]
 BASELINE = [(7.93, 5.60), (9.98, 8.45), (11.9, 11.1)]  # (aspect ratio, L_gradB), Proxima's entry, rounded
 HV_BASE = 129.8  # official score of that entry (the rounded points give 129.7)
 STEPS = [  # (label, hypervolume after it), from results/feasibility_tests/<test>.json
@@ -38,7 +38,9 @@ STEPS = [  # (label, hypervolume after it), from results/feasibility_tests/<test
     ("Test 17: diffusion seeds, round 2", 138.6),
     ("Test 18: 5×5 modes", 144.4),
     ("Test 19: 4 field periods", 144.4),
-    ("Test 20: fine modes, then raise", None),  # filled from the ledgers
+    ("Test 20: fine modes, then raise", 147.2),
+    ("Test 21: stretch and fatten", 157.9),
+    ("Test 22: second pass", None),  # filled from the ledgers
 ]
 
 
@@ -88,7 +90,7 @@ def main() -> None:
     a2.scatter(*zip(*BASELINE), s=16, color=ORANGE, zorder=4)
     a2.scatter([REF[1]], [-1], marker="x", color=INK, s=18, zorder=3)
     a2.set_xlim(7, 20.5)
-    a2.set_ylim(-1.6, 19)
+    a2.set_ylim(-1.6, 21)
     a2.set_xlabel("aspect ratio (lower = more compact)")
     a2.set_ylabel("L∇B (higher = simpler coils)")
     a2.text(19.7, 2.0, f"Track A ({len(ours)} feasible)\nHV {hv_ours:.1f}", ha="right", fontsize=7,
